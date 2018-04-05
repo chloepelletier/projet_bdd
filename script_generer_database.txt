@@ -1,3 +1,4 @@
+DROP DATABASE basketballer;
 create database basketballer;
 use basketballer;
 show tables;
@@ -5,28 +6,39 @@ show tables;
 /*Tables d'entités:
 */
 
+/*
 CREATE TABLE saison (annee int, PRIMARY KEY (annee));
+Table inutile
+*/
 
 CREATE TABLE equipe (num_equipe int, nom_equipe char(20), ville char(20), pays char(20), 
 	fondation date, PRIMARY KEY(num_equipe));
 
-CREATE TABLE test (num_equipe int);
-
+/*
 CREATE TABLE joueur (num_equipe int, num_joueur int, prenom char(20),
 	nom_joueur char(20), naissance date, taille_ft  real, poids_lbs real,
 	role char(20), main_forte bool, dist_bras_ft real,
 	PRIMARY KEY(num_equipe, num_joueur), FOREIGN KEY(num_equipe) REFERENCES equipe (num_equipe));
-/*ON DELETE...
+ON DELETE...
+Joueur devient un attribut fort.
 */
+
+CREATE TABLE joueur (id_joueur int, prenom char(20),
+	nom_famille char(20), naissance date, taille_ft  real, poids_lbs real,
+	role char(20), est_droitier bool, dist_bras_ft real,
+	PRIMARY KEY(id_joueur));
+ON DELETE...
+
 
 /*
 CREATE TABLE type_partie (est_serie bool, PRIMARY KEY(est_serie))
 Inutile parce que seulement 2!
 */
 
-CREATE TABLE partie (annee int, num_partie int, ville char(20), date_partie date, est_serie bool,
-	PRIMARY KEY(annee, num_partie), FOREIGN KEY(annee) REFERENCES saison(annee));
+CREATE TABLE partie (annee int, num_partie int, ville char(20), date_partie date,
+	PRIMARY KEY(annee, num_partie));
 /*DF date_partie -> annee.
+  Ajouter est_serie bool ? (Redondant)
   Enlevé score
 */
 
@@ -37,8 +49,7 @@ CREATE TABLE partie_reguliere (annee int, num_partie int, ville char(20), date_p
 Inutile parce qu'aucun attribut supplémentaire
 */
 
-CREATE TABLE serie (annee int, num_serie int, PRIMARY KEY(annee, num_serie),
-	FOREIGN KEY(annee) REFERENCES saison(annee));
+CREATE TABLE serie (annee int, num_serie int, PRIMARY KEY(annee, num_serie));
 
 /*
 CREATE TABLE partie_serie (annee int, num_partie int, num_sous_serie int,
@@ -52,29 +63,42 @@ CREATE TABLE appartient(annee int, num_partie int, num_serie int, num_sous_serie
 	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie),
 	FOREIGN KEY(annee, num_serie) REFERENCES serie(annee, num_serie));
 
-CREATE TABLE action (annee int, num_partie int, instant time,
+CREATE TABLE type_action(type char(20), PRIMARY KEY(type));
+INSERT INTO type_action VALUES ("lancer"), ("revirement"), ("faute"), ("rebond");
+
+CREATE TABLE action (annee int, num_partie int, instant time, type_action char(20),
 	PRIMARY KEY(annee, num_partie, instant),
-	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie));
+	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie),
+	FOREIGN KEY(type_action) REFERENCES type_action(type));
 
 CREATE TABLE lancer (annee int, num_partie int, instant time, type_lancer char(20),
 	PRIMARY KEY(annee, num_partie, instant),
-	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant));
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant),
+	ON DELETE CASCADE);
 
 CREATE TABLE panier (annee int, num_partie int, instant time,
 	PRIMARY KEY(annee, num_partie, instant),
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES lancer(annee, num_partie, instant));
 
-CREATE TABLE assiste(num_equipe int, num_joueur int, annee int, num_partie int, instant time,
+CREATE TABLE assiste(id_joueur int, annee int, num_partie int, instant time,
 	PRIMARY KEY(annee, num_partie, instant),
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES panier(annee, num_partie, instant),
-	FOREIGN KEY(num_equipe, num_joueur) REFERENCES joueur(num_equipe, num_joueur));
+	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur));
 
-CREATE TABLE revirement (instant time, type_revirement char(20),
-	PRIMARY KEY(instant), FOREIGN KEY(instant) REFERENCES action)
+CREATE TABLE revirement (annee int, num_partie int, instant time, type_revirement char(20),
+	PRIMARY KEY(annee, num_partie, instant),
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant),
+	ON DELETE CASCADE);
 
-CREATE TABLE faute (instant time, type_faute char(20), PRIMARY KEY(instant), FOREIGN KEY(instant) REFERENCES action)
+CREATE TABLE faute (annee int, num_partie int, instant time, type_faute char(20),
+	PRIMARY KEY(annee, num_partie, instant),
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant),
+	ON DELETE CASCADE);
 
-CREATE TABLE rebond (instant time, type_rebond char(20), PRIMARY KEY(instant), FOREIGN KEY(instant) REFERENCES action)
+CREATE TABLE rebond (annee int, num_partie int, instant time, type_rebond char(20),
+	PRIMARY KEY(annee, num_partie, instant),
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant),
+	ON DELETE CASCADE);
 
 /*Tests:
 Supprimer equipe supprime le joueur? (sans cascade) NON
