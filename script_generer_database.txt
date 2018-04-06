@@ -2,10 +2,12 @@
 SELECT Concat('DROP TRIGGER ', Trigger_Name, ';') FROM  information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = 'your_schema';
 Pour drop tous triggers. Doit utiliser une scheme (connais pas)
 */
+DROP TRIGGER type_action_lancer;
 DROP TRIGGER assiste_panier;
 DROP DATABASE basketballer;
 create database basketballer;
 use basketballer;
+
 show tables;
 
 
@@ -37,6 +39,8 @@ CREATE TABLE action (annee int, num_partie int, instant time, type_action char(2
 	PRIMARY KEY(annee, num_partie, instant),
 	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie),
 	FOREIGN KEY(type_action) REFERENCES type_action(type));
+/* Spécialisation totale pas implémentée (impossible?)
+*/
 
 CREATE TABLE type_lancer(type char(20), PRIMARY KEY(type));
 INSERT INTO type_lancer VALUES ("1pt"), ("2pt"), ("3pt");
@@ -47,10 +51,28 @@ CREATE TABLE lancer (annee int, num_partie int, instant time, type_lancer char(2
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
 		ON DELETE CASCADE);
 
+delimiter //
+CREATE TRIGGER type_action_lancer
+BEFORE INSERT ON lancer
+FOR EACH ROW
+BEGIN
+	IF (
+		SELECT type_action
+		FROM action
+		WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
+	 <> "lancer"
+	THEN SET NEW.instant = null;
+	END IF;
+END;//
+delimiter ;
+/* Ajouter 1 autre pour update?
+   Ajouter un de ce genre pour chaque spécialisation d'action :(
+*/
+
 /*
  Trigger pour le type de lancer OU table des types???
  Prefere table, mais trigger semble plus effiace.... 
- Si table, doit changer la nature d'"assiste"
+ Si table, doit changer l'interface d'"assiste" et ajouter un trigger pour assister seulement des paniers
 */
 
 CREATE TABLE assiste(id_joueur int, annee int, num_partie int, instant time,
@@ -72,7 +94,7 @@ BEGIN
 	END IF;
 END;//
 delimiter ;
-/* Ajouter autre pour update? */
+/* Ajouter 1 autre pour update? */
 
 CREATE TABLE type_faute(type char(20), PRIMARY KEY(type));
 INSERT INTO type_faute VALUES ("offensif"), ("defensif");
