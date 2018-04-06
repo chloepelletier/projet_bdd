@@ -125,10 +125,9 @@ CREATE TABLE concoure(annee int, num_partie int, num_equipe_loc int, num_equipe_
 	FOREIGN KEY(num_equipe_vis) REFERENCES equipe(num_equipe));
 
 CREATE TABLE contrat(num_equipe int, id_joueur int, debut date, fin date, dossard int,
-	PRIMARY KEY(num_equipe, num_joueur, debut),
+	PRIMARY KEY(num_equipe, id_joueur, debut),
 	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur),
 	FOREIGN KEY(num_equipe) REFERENCES equipe(num_equipe));
-
 
 
 CREATE TABLE participe(id_joueur int, annee int, num_partie int, minutes int,
