@@ -5,6 +5,7 @@ Pour drop tous triggers. Doit utiliser une scheme (connais pas)
 use basketballer;
 DROP TRIGGER type_action_lancer;
 DROP TRIGGER assiste_panier;
+DROP TRIGGER max_1_contrat_ouvert
 DROP DATABASE basketballer;
 create database basketballer;
 use basketballer;
@@ -128,6 +129,34 @@ CREATE TABLE contrat(num_equipe int, id_joueur int, debut date, fin date, dossar
 	PRIMARY KEY(num_equipe, id_joueur, debut),
 	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur),
 	FOREIGN KEY(num_equipe) REFERENCES equipe(num_equipe));
+
+delimiter //
+CREATE TRIGGER max_1_contrat_ouvert
+BEFORE INSERT ON contrat
+FOR EACH ROW
+BEGIN
+	IF (NEW.fin = null)
+		THEN IF (
+			SELECT COUNT(*)
+			FROM contrat
+			WHERE id_joueur = NEW.id_joueur AND fin = null
+			) > 0
+		THEN SET NEW.debut = null;
+		END IF;
+	END IF;
+END;//
+delimiter ;
+/*Pas efficace(?), on parcourt tous les contrats du joueur. Devrait prendre + récent(?)
+*/
+
+delimiter //
+CREATE TRIGGER max_1_dossard
+BEFORE INSERT ON contrat
+FOR EACH ROW
+BEGIN
+	
+END;//
+delimiter ;
 
 
 CREATE TABLE participe(id_joueur int, annee int, num_partie int, minutes int,
