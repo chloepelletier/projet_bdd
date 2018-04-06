@@ -117,5 +117,26 @@ CREATE TABLE rebond (annee int, num_partie int, instant time, type_rebond char(2
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant) 
 		ON DELETE CASCADE);
 
+CREATE TABLE concoure(annee int, num_partie int, num_equipe_loc int, num_equipe_vis int,
+	PRIMARY KEY(annee, num_partie),
+	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie),
+	FOREIGN KEY(num_equipe_loc) REFERENCES equipe(num_equipe),
+	FOREIGN KEY(num_equipe_vis) REFERENCES equipe(num_equipe));
+
+CREATE TABLE contrat(num_equipe int, num_joueur int, debut date, fin date,
+	PRIMARY KEY(num_equipe, num_joueur, debut),
+	FOREIGN KEY(num_joueur) REFERENCES joueur(num_joueur),
+	FOREIGN KEY(num_equipe) REFERENCES equipe(num_equipe));
+/*Peut aps add la contrainte sur joueur (weird)
+*/
+
+
+CREATE TABLE participe(num_joueur int, annee int, num_partie int, minutes int,
+	PRIMARY KEY(annee, num_partie, num_joueur),
+	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie),
+	FOREIGN KEY(num_joueur) REFERENCES joueur(num_joueur));
+/* Peut fortement changer 
+   Ajouter trigger maximum de 12 joueurs par equipe (minimum???)
+*/
 
 
