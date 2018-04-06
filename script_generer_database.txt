@@ -2,6 +2,7 @@
 SELECT Concat('DROP TRIGGER ', Trigger_Name, ';') FROM  information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = 'your_schema';
 Pour drop tous triggers. Doit utiliser une scheme (connais pas)
 */
+use basketballer;
 DROP TRIGGER type_action_lancer;
 DROP TRIGGER assiste_panier;
 DROP DATABASE basketballer;
@@ -130,10 +131,10 @@ CREATE TABLE contrat(num_equipe int, id_joueur int, debut date, fin date, dossar
 
 
 
-CREATE TABLE participe(num_joueur int, annee int, num_partie int, minutes int,
-	PRIMARY KEY(annee, num_partie, num_joueur),
+CREATE TABLE participe(id_joueur int, annee int, num_partie int, minutes int,
+	PRIMARY KEY(annee, num_partie, id_joueur),
 	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie),
-	FOREIGN KEY(num_joueur) REFERENCES joueur(num_joueur));
+	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur));
 /* Peut fortement changer 
    Ajouter trigger maximum de 12 joueurs par equipe (minimum???)
 */
