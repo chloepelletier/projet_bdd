@@ -5,7 +5,7 @@ Pour drop tous triggers. Doit utiliser une scheme (connais pas)
 use basketballer;
 DROP TRIGGER type_action_lancer;
 DROP TRIGGER assiste_panier;
-DROP TRIGGER max_1_contrat_ouvert
+DROP TRIGGER max_1_contrat_ouvert;
 DROP DATABASE basketballer;
 create database basketballer;
 use basketballer;
@@ -125,8 +125,8 @@ CREATE TABLE concoure(annee int, num_partie int, num_equipe_loc int, num_equipe_
 	FOREIGN KEY(num_equipe_loc) REFERENCES equipe(num_equipe),
 	FOREIGN KEY(num_equipe_vis) REFERENCES equipe(num_equipe));
 
-CREATE TABLE contrat(num_equipe int, id_joueur int, debut date, fin date, dossard int,
-	PRIMARY KEY(num_equipe, id_joueur, debut),
+CREATE TABLE contrat(num_equipe int, id_joueur int, debut_incl date, fin_excl date, dossard int,
+	PRIMARY KEY(num_equipe, id_joueur, debut_incl),
 	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur),
 	FOREIGN KEY(num_equipe) REFERENCES equipe(num_equipe));
 
@@ -135,13 +135,13 @@ CREATE TRIGGER max_1_contrat_ouvert
 BEFORE INSERT ON contrat
 FOR EACH ROW
 BEGIN
-	IF (NEW.fin = null)
+	IF (NEW.fin_excl = null)
 		THEN IF (
 			SELECT COUNT(*)
 			FROM contrat
-			WHERE id_joueur = NEW.id_joueur AND fin = null
+			WHERE id_joueur = NEW.id_joueur AND fin_excl = null
 			) > 0
-		THEN SET NEW.debut = null;
+		THEN SET NEW.debut_incl = null;
 		END IF;
 	END IF;
 END;//
@@ -154,10 +154,24 @@ CREATE TRIGGER max_1_dossard
 BEFORE INSERT ON contrat
 FOR EACH ROW
 BEGIN
-	
+	IF (NEW.fin_excl = null)
+		THEN IF(
+			SELECT COUNT(*)
+			FROM contrat
+			WHERE num_equipe = NEW.num_equipe
+			AND fin_excl > NEW.debut_incl AND dossard = NEW.dossard
+			) > 0
+		THEN SET NEW.debut_incl = null;
+		END IF;
+	END IF;
 END;//
 delimiter ;
 
+	ELSE IF
+	SELECT (*)
+	FROM contrat
+	WHERE id_joueur = NEW.id_joueur AND debut < NEW.fin
+	THEN SET NEW.debut_incl = null;
 
 CREATE TABLE participe(id_joueur int, annee int, num_partie int, minutes int,
 	PRIMARY KEY(annee, num_partie, id_joueur),
