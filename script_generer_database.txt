@@ -37,10 +37,11 @@ CREATE TABLE appartient(annee int, num_partie int, num_serie int, num_sous_serie
 CREATE TABLE type_action(type char(20), PRIMARY KEY(type));
 INSERT INTO type_action VALUES ("lancer"), ("revirement"), ("faute"), ("rebond");
 
-CREATE TABLE action (annee int, num_partie int, instant time, type_action char(20),
+CREATE TABLE action (annee int, num_partie int, instant time, type_action char(20), int id_joueur,
 	PRIMARY KEY(annee, num_partie, instant),
-	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie),
-	FOREIGN KEY(type_action) REFERENCES type_action(type));
+	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
+	FOREIGN KEY(type_action) REFERENCES type_action(type) ON DELETE CASCADE,
+	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE);
 /* Spécialisation totale pas implémentée (impossible?)
 */
 
@@ -130,6 +131,21 @@ CREATE TABLE contrat(num_equipe int, id_joueur int, debut_incl date, fin_excl da
 	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur),
 	FOREIGN KEY(num_equipe) REFERENCES equipe(num_equipe));
 
+
+
+delimiter //
+CREATE TRIGGER date_coherentes
+BEFORE INSERT ON contrat
+FOR EACH ROW
+BEGIN
+	IF (NEW.fin_excl <> null)
+		THEN IF (  )
+		THEN SET NEW.debut_incl = null;
+		END IF;
+	END IF;
+END;//
+delimiter ;
+
 delimiter //
 CREATE TRIGGER max_1_contrat_ouvert
 BEFORE INSERT ON contrat
@@ -146,7 +162,8 @@ BEGIN
 	END IF;
 END;//
 delimiter ;
-/*Pas efficace(?), on parcourt tous les contrats du joueur. Devrait prendre + récent(?)
+/*Pas efficace(?), on parcourt tous les contrats du joueur. Devrait prendre + récent(?).
+  Pas si grave car joueurs ne devrait pas changer siiii souvent d'équipe
 */
 
 delimiter //
