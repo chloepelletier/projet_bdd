@@ -158,20 +158,28 @@ BEGIN
 		THEN IF(
 			SELECT COUNT(*)
 			FROM contrat
-			WHERE num_equipe = NEW.num_equipe
-			AND fin_excl > NEW.debut_incl AND dossard = NEW.dossard
+			WHERE num_equipe = NEW.num_equipe AND fin_excl > NEW.debut_incl 
+				AND dossard = NEW.dossard
 			) > 0
+		THEN SET NEW.debut_incl = null;
+		END IF;
+	ELSE IF(SELECT COUNT(*)
+		FROM contrat
+		WHERE num_equipe = NEW.num_equipe
+			AND ((debut_incl between NEW.debut_incl and NEW.fin_excl)
+				OR (fin_excl - interval 1 day between NEW.debut_incl  and NEW.fin_excl))
+			AND dossard = NEW.dossard
+		) > 0
 		THEN SET NEW.debut_incl = null;
 		END IF;
 	END IF;
 END;//
 delimiter ;
-
-	ELSE IF
-	SELECT (*)
-	FROM contrat
-	WHERE id_joueur = NEW.id_joueur AND debut < NEW.fin
-	THEN SET NEW.debut_incl = null;
+/* Attention, "between __ and __" ne peut aps utiliser d'index sur date
+Devrait aps etre grave (pas mettre index), car pas énorméement de changements d'équipes dans 1 carrière.
+Équivalent à: " WHERE us_reg_date >= '2000-07-05'
+  		AND us_reg_date < '2011-11-10' + interval 1 day "
+*/
 
 CREATE TABLE participe(id_joueur int, annee int, num_partie int, minutes int,
 	PRIMARY KEY(annee, num_partie, id_joueur),
