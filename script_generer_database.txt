@@ -5,7 +5,10 @@ Pour drop tous triggers. Doit utiliser une scheme (connais pas)
 use basketballer;
 DROP TRIGGER type_action_lancer;
 DROP TRIGGER assiste_panier;
+DROP TRIGGER date_coherentes;
+DROP TRIGGER max_1_dossard;
 DROP TRIGGER max_1_contrat_ouvert;
+DROP TRIGGER max_1_contrat;
 DROP DATABASE basketballer;
 create database basketballer;
 use basketballer;
@@ -139,7 +142,7 @@ BEFORE INSERT ON contrat
 FOR EACH ROW
 BEGIN
 	IF (NEW.fin_excl <> null)
-		THEN IF (  )
+		THEN IF ( NEW.fin_excl <= NEW.debut_incl )
 		THEN SET NEW.debut_incl = null;
 		END IF;
 	END IF;
@@ -197,6 +200,32 @@ Devrait aps etre grave (pas mettre index), car pas énorméement de changements d'
 Équivalent à: " WHERE us_reg_date >= '2000-07-05'
   		AND us_reg_date < '2011-11-10' + interval 1 day "
 */
+
+delimiter //
+CREATE TRIGGER max_1_contrat
+BEFORE INSERT ON contrat
+FOR EACH ROW
+BEGIN
+IF (NEW.fin_excl = null)
+		THEN IF(
+			SELECT COUNT(*)
+			FROM contrat
+			WHERE id_joueur = NEW.id_joueur AND fin_excl > NEW.debut_incl
+			) > 0
+		THEN SET NEW.debut_incl = null;
+		END IF;
+ELSE IF (
+	SELECT COUNT(*)
+	FROM contrat
+	WHERE id_joueur = NEW.id_joueur
+		AND ((debut_incl between NEW.debut_incl and NEW.fin_excl)
+			OR (fin_excl - interval 1 day between NEW.debut_incl  and NEW.fin_excl))
+	) > 0
+	THEN SET NEW.debut_incl = null;
+	END IF;
+END IF;
+END;//
+delimiter ;
 
 CREATE TABLE participe(id_joueur int, annee int, num_partie int, minutes int,
 	PRIMARY KEY(annee, num_partie, id_joueur),
