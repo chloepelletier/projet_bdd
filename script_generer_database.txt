@@ -35,36 +35,37 @@ CREATE TABLE action (annee int, num_partie int, instant time, type_action char(2
 	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie),
 	FOREIGN KEY(type_action) REFERENCES type_action(type));
 
-CREATE TABLE lancer (annee int, num_partie int, instant time, type_lancer char(20),
+CREATE TABLE lancer (annee int, num_partie int, instant time, type_lancer char(20), est_panier bool.
 	PRIMARY KEY(annee, num_partie, instant),
-	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant),
-	ON DELETE CASCADE);
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
+		ON DELETE CASCADE);
 
+/*
 CREATE TABLE panier (annee int, num_partie int, instant time,
 	PRIMARY KEY(annee, num_partie, instant),
-	FOREIGN KEY(annee, num_partie, instant) REFERENCES lancer(annee, num_partie, instant));
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES lancer(annee, num_partie, instant)
+		ON DELETE CASCADE);
+*/
 
 CREATE TABLE assiste(id_joueur int, annee int, num_partie int, instant time,
 	PRIMARY KEY(annee, num_partie, instant),
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES panier(annee, num_partie, instant),
 	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur));
 
-CREATE TRIGGER
-
 CREATE TABLE revirement (annee int, num_partie int, instant time, type_revirement char(20),
 	PRIMARY KEY(annee, num_partie, instant),
-	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant),
-	ON DELETE CASCADE);
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
+		ON DELETE CASCADE);
 
 CREATE TABLE faute (annee int, num_partie int, instant time, type_faute char(20),
 	PRIMARY KEY(annee, num_partie, instant),
-	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant),
-	ON DELETE CASCADE);
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
+		ON DELETE CASCADE);
 
 CREATE TABLE rebond (annee int, num_partie int, instant time, type_rebond char(20),
 	PRIMARY KEY(annee, num_partie, instant),
-	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant),
-	ON DELETE CASCADE);
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant) 
+		ON DELETE CASCADE);
 
 
 
