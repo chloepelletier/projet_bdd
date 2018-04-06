@@ -123,12 +123,11 @@ CREATE TABLE concoure(annee int, num_partie int, num_equipe_loc int, num_equipe_
 	FOREIGN KEY(num_equipe_loc) REFERENCES equipe(num_equipe),
 	FOREIGN KEY(num_equipe_vis) REFERENCES equipe(num_equipe));
 
-CREATE TABLE contrat(num_equipe int, num_joueur int, debut date, fin date,
+CREATE TABLE contrat(num_equipe int, id_joueur int, debut date, fin date, dossard int,
 	PRIMARY KEY(num_equipe, num_joueur, debut),
-	FOREIGN KEY(num_joueur) REFERENCES joueur(num_joueur),
+	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur),
 	FOREIGN KEY(num_equipe) REFERENCES equipe(num_equipe));
-/*Peut aps add la contrainte sur joueur (weird)
-*/
+
 
 
 CREATE TABLE participe(num_joueur int, annee int, num_partie int, minutes int,
