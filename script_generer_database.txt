@@ -134,7 +134,16 @@ CREATE TABLE contrat(num_equipe int, id_joueur int, debut_incl date, fin_excl da
 	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur),
 	FOREIGN KEY(num_equipe) REFERENCES equipe(num_equipe));
 
-
+delimiter //
+CREATE TRIGGER fin_contrat_null
+BEFORE INSERT ON contrat
+FOR EACH ROW
+BEGIN
+	IF (NEW.fin_excl = null)
+	THEN SET NEW.fin_excl = 9999-12-31;
+	END IF;
+END;//
+delimiter ;
 
 delimiter //
 CREATE TRIGGER date_coherentes
