@@ -231,8 +231,28 @@ CREATE TABLE participe(id_joueur int, annee int, num_partie int, minutes int,
 	PRIMARY KEY(annee, num_partie, id_joueur),
 	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie),
 	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur));
-/* Peut fortement changer 
-   Ajouter trigger maximum de 12 joueurs par equipe (minimum???)
+/* Peut fortement changer
+   Trigger: Juste des joueurs d'une des deux équipes
+   Ajouter trigger maximum de 12 joueurs par equipe (minimum?-> aucun))
+   Potentiellement, faire en même temps (plus efficace)
 */
 
+delimiter //
+CREATE TRIGGER joueurs_bonnes_equipes
+BEFORE INSERT ON contrat
+FOR EACH ROW
+BEGIN
+IF(trouver la partie, trouver le contrat du joueur à la date, faire juste visiteur?)
+	SELECT
+	FROM partie P, concoure Cc, contrat Ct
+	WHERE P.annee = NEW.annee AND p.num_partie = NEW.num_partie
+		AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
+		AND NEW.id_joueur = Ct.id_joueur
+	NEW.joueur
 
+END;//
+delimiter ;
+
+
+
+show tables;
