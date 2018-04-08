@@ -8,118 +8,42 @@ DELETE FROM appartient;
 DELETE FROM contrat;
 
 
-
 INSERT INTO equipe(num_equipe int, nom_equipe, ville, pays, fondation)
-VALUES (1,'knicks','new-york','etats_unis','1970-02-25');
-
-INSERT INTO equipe(num_equipe int, nom_equipe, ville, pays, fondation)
-VALUES (2,'celtics','new-york','etats_unis','1975-04-12');
-
-INSERT INTO equipe(num_equipe int, nom_equipe, ville, pays, fondation)
-VALUES (3,'nets','brooklyn','etats_unis','1989-10-03');
+VALUES 	(1,'knicks','new-york','etats_unis','1970-02-25'),
+ 	(2,'celtics','new-york','etats_unis','1975-04-12'),
+	(3,'nets','brooklyn','etats_unis','1989-10-03');
 
 INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
 		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (1,'pierre','dupont','1994-04-20',5,180,'meneur',true,4.5);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (2,'jean','lassalle','1995-04-29',6,190,'pivot',false,4.6);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (3,'francis','boucher','1990-03-18',6.5,170,'allie',true,5);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (4,'jules','surmont','1994-06-18',7,175,'arriere',true,5);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (5,'maxime','coupet','1989-11-20',6,180,'allie fort',true,6.3);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (6,'kevin','marshall','1990-10-29',6.1,183,'pivot',false,4.9);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (7,'lucas','parker','1996-08-02',7,187,'allie fort',false,5.8);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (8,'andre','lemaitre','1988-06-18',6,189,'arriere',true,6);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (9,'paul','henri','1987-12-20',6.5,200,'allie fort',false,6.4);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (10,'maxime','coupet','1989-11-20',6,189,'allie fort',true,6.3);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (11,'jean','gorget','1991-10-09',6.4,180,'arriere',true,5);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (12,'kyle','march','1989-11-12',7.1,183,'allie',false,5.3);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (13,'patrick','dempsey','1992-12-12',6.3,175,'arriere',true,6.1);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (14,'huck','polish','1980-03-20',6.5,178,'allie fort',false,6.4);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (15,'luc','matisse','1997-12-20',6.1,201,'allie',true,6.3);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (16,'maxime','longre','2000-03-01',6.3,199,'arriere',false,6);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (17,'loic','nottet','1991-10-10',6.2,180,'arriere',true,5);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (18,'kyle','andros','1990-10-08',7.1,183,'allie fort',true,5.3);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (19,'matheo','muzoti','2000-05-02',6.3,175,'arriere',true,6.1);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (20,'leo','gago','1997-08-22',6.5, 180,'meneur',false,7);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (21,'jack','luti','1999-05-09',6.3,175,'pivot',true,6.1);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (22,'henri','lune','1998-09-22',6.5, 150,'allie',false,6.5);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (23,'antoine','grizman','1990-06-09',6.3,175,'pivot',true,6.1);
-
-INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
-		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (24,'malik','kose','1990-10-22',6.5,100,'allie fort',true,6.5);
+VALUES	 (1,'pierre','dupont','1994-04-20',5,180,'meneur',true,4.5),
+	 (2,'jean','lassalle','1995-04-29',6,190,'pivot',false,4.6),
+	 (3,'francis','boucher','1990-03-18',6.5,170,'allie',true,5),
+	 (4,'jules','surmont','1994-06-18',7,175,'arriere',true,5),
+	 (5,'maxime','coupet','1989-11-20',6,180,'allie fort',true,6.3),
+	 (6,'kevin','marshall','1990-10-29',6.1,183,'pivot',false,4.9),
+	 (7,'lucas','parker','1996-08-02',7,187,'allie fort',false,5.8),
+	 (8,'andre','lemaitre','1988-06-18',6,189,'arriere',true,6),
+	 (9,'paul','henri','1987-12-20',6.5,200,'allie fort',false,6.4),
+	 (10,'maxime','coupet','1989-11-20',6,189,'allie fort',true,6.3),
+	 (11,'jean','gorget','1991-10-09',6.4,180,'arriere',true,5),
+	 (12,'kyle','march','1989-11-12',7.1,183,'allie',false,5.3),
+	 (13,'patrick','dempsey','1992-12-12',6.3,175,'arriere',true,6.1),
+	 (14,'huck','polish','1980-03-20',6.5,178,'allie fort',false,6.4),
+	 (15,'luc','matisse','1997-12-20',6.1,201,'allie',true,6.3),
+	 (16,'maxime','longre','2000-03-01',6.3,199,'arriere',false,6),
+	 (17,'loic','nottet','1991-10-10',6.2,180,'arriere',true,5),
+	 (18,'kyle','andros','1990-10-08',7.1,183,'allie fort',true,5.3),
+	 (19,'matheo','muzoti','2000-05-02',6.3,175,'arriere',true,6.1),
+	 (20,'leo','gago','1997-08-22',6.5, 180,'meneur',false,7),
+	 (21,'jack','luti','1999-05-09',6.3,175,'pivot',true,6.1),
+	 (22,'henri','lune','1998-09-22',6.5, 150,'allie',false,6.5),
+	 (23,'antoine','grizman','1990-06-09',6.3,175,'pivot',true,6.1),
+	 (24,'malik','kose','1990-10-22',6.5,100,'allie fort',true,6.5);
 
 
 INSERT INTO partie (annee, num_partie, ville, date_partie) 
-VALUES (2018, 1, 'new-york', '2018-03-20');
-
-INSERT INTO partie (annee, num_partie, ville, date_partie) 
-VALUES (2018, 2, 'brooklyn', '2018-03-22');
+VALUES 	 (2018, 1, 'new-york', '2018-03-20'),
+	 (2018, 2, 'brooklyn', '2018-03-22');
 
 /* Pour mettre plus de 7 parties dans une série: */
 INSERT INTO partie (annee, num_partie, ville, date_partie) 
@@ -131,28 +55,26 @@ VALUES (2018, 3, 'brooklyn', '2018-03-22'),
 	(2018, 8, 'brooklyn', '2018-03-22');
 
 INSERT INTO partie (annee, num_partie, ville, date_partie) 
-VALUES (2017, 1, 'new-york', '2017-03-02');
-
-INSERT INTO partie (annee, num_partie, ville, date_partie) 
-VALUES (2016, 1, 'new-york', '2016-04-02');
+VALUES   (2017, 1, 'new-york', '2017-03-02'),
+	 (2016, 1, 'new-york', '2016-04-02');
 
 INSERT INTO serie (annee, num_serie)
 VALUES (2018,1);
 
 INSERT INTO serie (annee, num_serie)
-VALUES (2018,2);
-
-INSERT INTO serie (annee, num_serie)
-VALUES (2017,1);
+VALUES  (2018,2),
+	(2017,1);
 
 INSERT INTO appartient(annee, num_partie, num_serie, num_sous_serie)
 VALUES (2018,1, 1, 2);
 
 INSERT INTO appartient(annee, num_partie, num_serie, num_sous_serie)
 VALUES (2018,2, 1, 2); /*peut aps mettre meme numéro sous_serie*/
-
 INSERT INTO appartient(annee, num_partie, num_serie, num_sous_serie)
 VALUES (2018,2, 1, 1);
+
+INSERT INTO appartient (annee, num_partie,  num_serie, num_sous_serie) 
+VALUES	(2018, 8, 1, 8); /* DOIT ÉCHOUER, depasse 7 parties */
 
 INSERT INTO appartient (annee, num_partie,  num_serie, num_sous_serie) 
 VALUES	(2018, 3, 1, 3),
@@ -162,10 +84,52 @@ VALUES	(2018, 3, 1, 3),
 	(2018, 7, 1, 7);
 
 INSERT INTO appartient (annee, num_partie,  num_serie, num_sous_serie) 
-VALUES	(2018, 8, 1, 8); /* DOIT ÉCHOUER */
+VALUES	(2018, 8, 1, 0); /* DOIT ÉCHOUER, depasse 7 parties */
 
 INSERT INTO appartient(annee, num_partie, num_serie, num_sous_serie)
 VALUES (2017,1, 1, 1);
+
+/*Rendy ici, insert dans concoure fonctionne aps */
+INSERT INT0 concoure(annee, num_partie, num_equipe_loc, num_equipe_vis)
+VALUES (2018, 1, 1, 2);
+
+INSERT INT0 concoure(annee, num_partie, num_equipe_loc, num_equipe_vis)
+VALUES (2018, 2, 3, 1);
+
+INSERT INT0 concoure(annee, num_partie, num_equipe_loc, num_equipe_vis)
+VALUES (2017, 1, 1, 3);
+
+INSERT INT0 concoure(annee, num_partie, num_equipe_loc, num_equipe_vis)
+VALUES (2016, 1, 2, 1);
+
+INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
+	(1,1,'2010-03-12',NULL,1),
+	(1,2,'2010-03-12',NULL,2),
+	(1,3,'2010-03-12',NULL,3),
+	(1,4,'2010-03-12',NULL,4),
+	(1,5,'2010-03-12',NULL,5),
+	(1,6,'2010-03-12',NULL,6),
+	(1,7,'2010-03-12',NULL,7),
+	(1,8,'2010-03-12',NULL,8),
+	(1,9,'2010-03-12',NULL,9),
+	(1,10,'2010-03-12',NULL,10),
+	(1,11,'2010-03-12',NULL,11),
+	(1,12,'2010-03-12',NULL,12);
+
+INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
+VALUES(2,1,'2012-05-12',NULL,13); /* Doit échouer, contrats en conflit */
+INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
+VALUES(1,13,'2010-03-12','2010-03-12',13); /* Doit échouer, datesincohérentes */
+INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
+VALUES(1,13,'2010-03-12','2009-03-12',13); /* Doit échouer, datesincohérentes */
+INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
+VALUES(1,13,'2010-03-12',NULL,1); /* Doit échouer, même dossard */
+INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
+VALUES(1,13,'2010-03-12',NULL,13);
+
+INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
+VALUES(2,14,'2010-03-12',NULL,1),
+VALUES(2,15,'2010-03-12',NULL,2);
 
 INSERT INTO action (annee, num_partie, instant, type_action, id_joueur)
 VALUES (2018,1,'00:01:30','lancer',1);
@@ -210,35 +174,4 @@ VALUES (2018,1,'00:25:32','defensif');
 
 /* Verif rendue ici. joueu faisant action doit etre dans 'participe', pas 'joueur' */
 
-INSERT INT0 concoure(annee, num_partie, num_equipe_loc, num_equipe_vis)
-VALUES (2018, 1, 1, 2);
 
-INSERT INT0 concoure(annee, num_partie, num_equipe_loc, num_equipe_vis)
-VALUES (2018, 2, 3, 1);
-
-INSERT INT0 concoure(annee, num_partie, num_equipe_loc, num_equipe_vis)
-VALUES (2017, 1, 1, 3);
-
-INSERT INT0 concoure(annee, num_partie, num_equipe_loc, num_equipe_vis)
-VALUES (2016, 1, 2, 1);
-
-INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
-VALUES(1,1,'2010-03-12',NULL,1);
-
-INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
-VALUES(1,2,'2010-03-12',NULL,1);
-
-INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
-VALUES(1,3,'2010-03-12',NULL,1);
-
-INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
-VALUES(1,4,'2010-03-12',NULL,1);
-
-INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
-VALUES(1,5,'2010-03-12',NULL,1);
-
-INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
-VALUES(1,6,'2010-03-12',NULL,1);
-
-INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
-VALUES(1,7,'2010-03-12',NULL,1);

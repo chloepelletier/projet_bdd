@@ -206,7 +206,8 @@ CREATE TABLE assiste(id_joueur int, annee int, num_partie int, instant time,
 	PRIMARY KEY(annee, num_partie, instant),
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES lancer(annee, num_partie, instant)
 		ON DELETE CASCADE,
-	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE);
+	FOREIGN KEY(annee, num_partie,id_joueur) REFERENCES participe(annee, num_partie,id_joueur)
+		ON DELETE CASCADE);
 
 delimiter //
 CREATE TRIGGER assiste_panier
