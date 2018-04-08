@@ -7,7 +7,7 @@ DROP TRIGGER type_action_lancer;
 DROP TRIGGER assiste_panier;
 DROP TRIGGER date_coherentes;
 DROP TRIGGER max_1_dossard;
-DROP TRIGGER max_1_contrat_ouvert;
+DROP TRIGGER joueur_bonne_equipe
 DROP TRIGGER max_1_contrat;
 DROP DATABASE basketballer;
 create database basketballer;
@@ -247,18 +247,20 @@ CREATE TABLE participe(id_joueur int, annee int, num_partie int, minutes int,
 */
 
 delimiter //
-CREATE TRIGGER joueurs_bonnes_equipes
-BEFORE INSERT ON contrat
+CREATE TRIGGER joueur_bonne_equipe
+BEFORE INSERT ON participe
 FOR EACH ROW
 BEGIN
-IF(trouver la partie, trouver le contrat du joueur à la date, faire juste visiteur?)
-	SELECT
-	FROM partie P, concoure Cc, contrat Ct
-	WHERE P.annee = NEW.annee AND p.num_partie = NEW.num_partie
-		AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
-		AND NEW.id_joueur = Ct.id_joueur
-	NEW.joueur
-
+IF(  NOT EXISTS(SELECT NULL
+    FROM partie P, concoure Cc, contrat Ct
+    WHERE P.annee = NEW.annee AND P.num_partie = NEW.num_partie
+      AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
+      AND (Ct.num_equipe = P.num_equipe_loc OR Ct.num_equiple = P.num_equipe_vis) AND Ct.id_joueur = NEW.id_joueur
+      AND debut_incl <= P.date_partie AND P.date_partie < fin_excl
+    )
+)
+THEN SET NEW.id_joueur = null;
+END IF;
 END;//
 delimiter ;
 
