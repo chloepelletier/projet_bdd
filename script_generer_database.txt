@@ -156,64 +156,30 @@ CREATE TRIGGER date_coherentes
 BEFORE INSERT ON contrat
 FOR EACH ROW
 BEGIN
-	IF (NEW.fin_excl <> null)
-		THEN IF ( NEW.fin_excl <= NEW.debut_incl )
-		THEN SET NEW.debut_incl = null;
-		END IF;
-	END IF;
+  IF ( NEW.fin_excl <= NEW.debut_incl )
+  THEN SET NEW.debut_incl = null;
+  END IF;
 END;//
 delimiter ;
-
-delimiter //
-CREATE TRIGGER max_1_contrat_ouvert
-BEFORE INSERT ON contrat
-FOR EACH ROW
-BEGIN
-	IF (NEW.fin_excl = null)
-		THEN IF (
-			SELECT COUNT(*)
-			FROM contrat
-			WHERE id_joueur = NEW.id_joueur AND fin_excl = null
-			) > 0
-		THEN SET NEW.debut_incl = null;
-		END IF;
-	END IF;
-END;//
-delimiter ;
-/*Pas efficace(?), on parcourt tous les contrats du joueur. Devrait prendre + récent(?).
-  Pas si grave car joueurs ne devrait pas changer siiii souvent d'équipe
-*/
 
 delimiter //
 CREATE TRIGGER max_1_dossard
 BEFORE INSERT ON contrat
 FOR EACH ROW
 BEGIN
-	IF (NEW.fin_excl = null)
-		THEN IF(
-			SELECT COUNT(*)
-			FROM contrat
-			WHERE num_equipe = NEW.num_equipe AND fin_excl > NEW.debut_incl 
-				AND dossard = NEW.dossard
-			) > 0
-		THEN SET NEW.debut_incl = null;
-		END IF;
-	ELSE IF(SELECT COUNT(*)
-		FROM contrat
-		WHERE num_equipe = NEW.num_equipe
-			AND ((debut_incl between NEW.debut_incl and NEW.fin_excl)
-				OR (fin_excl - interval 1 day between NEW.debut_incl  and NEW.fin_excl))
-			AND dossard = NEW.dossard
-		) > 0
-		THEN SET NEW.debut_incl = null;
-		END IF;
-	END IF;
+  IF(SELECT COUNT(*)
+    FROM contrat
+    WHERE num_equipe = NEW.num_equipe
+      AND debut_incl < NEW.fin_excl AND NEW.debut_incl < fin_excl
+      AND dossard = NEW.dossard
+    ) > 0
+  THEN SET NEW.debut_incl = null;
+  END IF;
 END;//
 delimiter ;
-/* Attention, "between __ and __" ne peut aps utiliser d'index sur date
-Devrait aps etre grave (pas mettre index), car pas énorméement de changements d'équipes dans 1 carrière.
-Équivalent à: " WHERE us_reg_date >= '2000-07-05'
-  		AND us_reg_date < '2011-11-10' + interval 1 day "
+/* Avant, beuacoup moins efficace:
+  AND ((debut_incl between NEW.debut_incl and NEW.fin_excl)
+  OR (fin_excl - interval 1 day between NEW.debut_incl  and NEW.fin_excl))
 */
 
 delimiter //
@@ -221,23 +187,13 @@ CREATE TRIGGER max_1_contrat
 BEFORE INSERT ON contrat
 FOR EACH ROW
 BEGIN
-IF (NEW.fin_excl = null)
-		THEN IF(
-			SELECT COUNT(*)
-			FROM contrat
-			WHERE id_joueur = NEW.id_joueur AND fin_excl > NEW.debut_incl
-			) > 0
-		THEN SET NEW.debut_incl = null;
-		END IF;
-ELSE IF (
-	SELECT COUNT(*)
-	FROM contrat
-	WHERE id_joueur = NEW.id_joueur
-		AND ((debut_incl between NEW.debut_incl and NEW.fin_excl)
-			OR (fin_excl - interval 1 day between NEW.debut_incl  and NEW.fin_excl))
-	) > 0
-	THEN SET NEW.debut_incl = null;
-	END IF;
+IF (
+  SELECT COUNT(*)
+  FROM contrat
+  WHERE id_joueur = NEW.id_joueur
+    AND debut_incl < NEW.fin_excl AND NEW.debut_incl < fin_excl
+  ) > 0
+THEN SET NEW.debut_incl = null;
 END IF;
 END;//
 delimiter ;
