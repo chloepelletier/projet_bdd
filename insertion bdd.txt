@@ -8,7 +8,7 @@ DELETE FROM appartient;
 DELETE FROM contrat;
 
 
-INSERT INTO equipe(num_equipe int, nom_equipe, ville, pays, fondation)
+INSERT INTO equipe(num_equipe, nom_equipe, ville, pays, fondation)
 VALUES 	(1,'knicks','new-york','etats_unis','1970-02-25'),
  	(2,'celtics','new-york','etats_unis','1975-04-12'),
 	(3,'nets','brooklyn','etats_unis','1989-10-03');
@@ -89,21 +89,14 @@ VALUES	(2018, 8, 1, 0); /* DOIT ÉCHOUER, depasse 7 parties */
 INSERT INTO appartient(annee, num_partie, num_serie, num_sous_serie)
 VALUES (2017,1, 1, 1);
 
-/*Rendy ici, insert dans concoure fonctionne aps */
-INSERT INT0 concoure(annee, num_partie, num_equipe_loc, num_equipe_vis)
-VALUES (2018, 1, 1, 2);
-
-INSERT INT0 concoure(annee, num_partie, num_equipe_loc, num_equipe_vis)
-VALUES (2018, 2, 3, 1);
-
-INSERT INT0 concoure(annee, num_partie, num_equipe_loc, num_equipe_vis)
-VALUES (2017, 1, 1, 3);
-
-INSERT INT0 concoure(annee, num_partie, num_equipe_loc, num_equipe_vis)
-VALUES (2016, 1, 2, 1);
+INSERT INTO concoure(annee, num_partie, num_equipe_loc, num_equipe_vis)
+VALUES   (2018, 1, 1, 2),
+	 (2018, 2, 3, 1),
+	 (2017, 1, 1, 3),
+	 (2016, 1, 2, 1);
 
 INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
-	(1,1,'2010-03-12',NULL,1),
+VALUES	(1,1,'2010-03-12',NULL,1),
 	(1,2,'2010-03-12',NULL,2),
 	(1,3,'2010-03-12',NULL,3),
 	(1,4,'2010-03-12',NULL,4),
@@ -118,6 +111,9 @@ INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
 
 INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
 VALUES(2,1,'2012-05-12',NULL,13); /* Doit échouer, contrats en conflit */
+
+/*RENDU ici */
+
 INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
 VALUES(1,13,'2010-03-12','2010-03-12',13); /* Doit échouer, datesincohérentes */
 INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
