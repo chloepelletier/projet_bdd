@@ -42,93 +42,6 @@ END;//
 delimiter ;
 
 
-CREATE TABLE type_action(type char(20), PRIMARY KEY(type));
-INSERT INTO type_action VALUES ("lancer"), ("revirement"), ("faute"), ("rebond");
-
-CREATE TABLE action (annee int, num_partie int, instant time, type_action char(20), id_joueur int,
-	PRIMARY KEY(annee, num_partie, instant),
-	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
-	FOREIGN KEY(type_action) REFERENCES type_action(type) ON DELETE CASCADE,
-	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE);
-/* Spécialisation totale pas implémentée (impossible?)
-*/
-
-CREATE TABLE type_lancer(type char(20), PRIMARY KEY(type));
-INSERT INTO type_lancer VALUES ("1pt"), ("2pt"), ("3pt");
-
-CREATE TABLE lancer (annee int, num_partie int, instant time, type_lancer char(20), est_panier bool,
-	PRIMARY KEY(annee, num_partie, instant),
-	FOREIGN KEY(type_lancer) REFERENCES type_lancer(type),
-	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
-		ON DELETE CASCADE);
-
-delimiter //
-CREATE TRIGGER type_action_lancer
-BEFORE INSERT ON lancer
-FOR EACH ROW
-BEGIN
-	IF (
-		SELECT type_action
-		FROM action
-		WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
-	 <> "lancer"
-	THEN SET NEW.instant = null;
-	END IF;
-END;//
-delimiter ;
-/* Ajouter 1 autre pour update?
-   Ajouter un de ce genre pour chaque spécialisation d'action :(
-*/
-
-/*
- Trigger pour le type de lancer OU table des types???
- Prefere table, mais trigger semble plus effiace.... 
- Si table, doit changer l'interface d'"assiste" et ajouter un trigger pour assister seulement des paniers
-*/
-
-CREATE TABLE assiste(id_joueur int, annee int, num_partie int, instant time,
-	PRIMARY KEY(annee, num_partie, instant),
-	FOREIGN KEY(annee, num_partie, instant) REFERENCES lancer(annee, num_partie, instant)
-		ON DELETE CASCADE,
-	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE);
-
-delimiter //
-CREATE TRIGGER assiste_panier
-BEFORE INSERT ON assiste
-FOR EACH ROW
-BEGIN
-	IF (
-		SELECT est_panier
-		FROM lancer
-		WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
-	 = false
-	THEN SET NEW.instant = null;
-	END IF;
-END;//
-delimiter ;
-/* Ajouter 1 autre pour update? */
-
-CREATE TABLE type_faute(type char(20), PRIMARY KEY(type));
-INSERT INTO type_faute VALUES ("offensif"), ("defensif");
-
-CREATE TABLE revirement (annee int, num_partie int, instant time, type_revirement char(20),
-	PRIMARY KEY(annee, num_partie, instant),
-	FOREIGN KEY(type_revirement) REFERENCES type_faute(type),
-	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
-		ON DELETE CASCADE);
-
-CREATE TABLE faute (annee int, num_partie int, instant time, type_faute char(20),
-	PRIMARY KEY(annee, num_partie, instant),
-	FOREIGN KEY(type_faute) REFERENCES type_faute(type),
-	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
-		ON DELETE CASCADE);
-
-CREATE TABLE rebond (annee int, num_partie int, instant time, type_rebond char(20),
-	PRIMARY KEY(annee, num_partie, instant),
-	FOREIGN KEY(type_rebond) REFERENCES type_faute(type),
-	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant) 
-		ON DELETE CASCADE);
-
 CREATE TABLE concoure(annee int, num_partie int, num_equipe_loc int, num_equipe_vis int,
 	PRIMARY KEY(annee, num_partie),
 	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
@@ -245,6 +158,92 @@ THEN SET NEW.id_joueur = null;
 END IF;
 END;//
 delimiter ;
+
+
+CREATE TABLE type_action(type char(20), PRIMARY KEY(type));
+INSERT INTO type_action VALUES ("lancer"), ("revirement"), ("faute"), ("rebond");
+
+CREATE TABLE action (annee int, num_partie int, instant time, type_action char(20), id_joueur int,
+	PRIMARY KEY(annee, num_partie, instant),
+	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
+	FOREIGN KEY(type_action) REFERENCES type_action(type) ON DELETE CASCADE,
+	FOREIGN KEY(annee, num_partie,id_joueur) REFERENCES participe(annee, num_partie,id_joueur)
+		ON DELETE CASCADE);
+
+CREATE TABLE type_lancer(type char(20), PRIMARY KEY(type));
+INSERT INTO type_lancer VALUES ("1pt"), ("2pt"), ("3pt");
+
+CREATE TABLE lancer (annee int, num_partie int, instant time, type_lancer char(20), est_panier bool,
+	PRIMARY KEY(annee, num_partie, instant),
+	FOREIGN KEY(type_lancer) REFERENCES type_lancer(type),
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
+		ON DELETE CASCADE);
+
+delimiter //
+CREATE TRIGGER type_action_lancer
+BEFORE INSERT ON lancer
+FOR EACH ROW
+BEGIN
+	IF (	SELECT type_action
+		FROM action
+		WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
+	 <> "lancer"
+	THEN SET NEW.instant = null;
+	END IF;
+END;//
+delimiter ;
+/* Ajouter 1 autre pour update?
+   Ajouter un de ce genre pour chaque spécialisation d'action :(
+*/
+
+/*
+ Trigger pour le type de lancer OU table des types???
+ Prefere table, mais trigger semble plus effiace.... 
+ Si table, doit changer l'interface d'"assiste" et ajouter un trigger pour assister seulement des paniers
+*/
+
+CREATE TABLE assiste(id_joueur int, annee int, num_partie int, instant time,
+	PRIMARY KEY(annee, num_partie, instant),
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES lancer(annee, num_partie, instant)
+		ON DELETE CASCADE,
+	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE);
+
+delimiter //
+CREATE TRIGGER assiste_panier
+BEFORE INSERT ON assiste
+FOR EACH ROW
+BEGIN
+	IF (
+		SELECT est_panier
+		FROM lancer
+		WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
+	 = false
+	THEN SET NEW.instant = null;
+	END IF;
+END;//
+delimiter ;
+/* Ajouter 1 autre pour update? */
+
+CREATE TABLE type_faute(type char(20), PRIMARY KEY(type));
+INSERT INTO type_faute VALUES ("offensif"), ("defensif");
+
+CREATE TABLE revirement (annee int, num_partie int, instant time, type_revirement char(20),
+	PRIMARY KEY(annee, num_partie, instant),
+	FOREIGN KEY(type_revirement) REFERENCES type_faute(type),
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
+		ON DELETE CASCADE);
+
+CREATE TABLE faute (annee int, num_partie int, instant time, type_faute char(20),
+	PRIMARY KEY(annee, num_partie, instant),
+	FOREIGN KEY(type_faute) REFERENCES type_faute(type),
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
+		ON DELETE CASCADE);
+
+CREATE TABLE rebond (annee int, num_partie int, instant time, type_rebond char(20),
+	PRIMARY KEY(annee, num_partie, instant),
+	FOREIGN KEY(type_rebond) REFERENCES type_faute(type),
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant) 
+		ON DELETE CASCADE);
 
 
 
