@@ -7,8 +7,8 @@ DROP TRIGGER type_action_lancer;
 DROP TRIGGER assiste_panier;
 DROP TRIGGER date_coherentes;
 DROP TRIGGER max_1_dossard;
-DROP TRIGGER joueur_bonne_equipe
 DROP TRIGGER max_1_contrat;
+DROP TRIGGER joueur_bonne_equipe;
 DROP DATABASE basketballer;
 create database basketballer;
 use basketballer;
@@ -34,13 +34,13 @@ CREATE TABLE serie (annee int, num_serie int, PRIMARY KEY(annee, num_serie));
 
 CREATE TABLE appartient(annee int, num_partie int, num_serie int, num_sous_serie int,
 	PRIMARY KEY(annee, num_partie),
-	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie),
-	FOREIGN KEY(annee, num_serie) REFERENCES serie(annee, num_serie));
+	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
+	FOREIGN KEY(annee, num_serie) REFERENCES serie(annee, num_serie) ON DELETE CASCADE);
 
 CREATE TABLE type_action(type char(20), PRIMARY KEY(type));
 INSERT INTO type_action VALUES ("lancer"), ("revirement"), ("faute"), ("rebond");
 
-CREATE TABLE action (annee int, num_partie int, instant time, type_action char(20), int id_joueur,
+CREATE TABLE action (annee int, num_partie int, instant time, type_action char(20), id_joueur int,
 	PRIMARY KEY(annee, num_partie, instant),
 	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
 	FOREIGN KEY(type_action) REFERENCES type_action(type) ON DELETE CASCADE,
@@ -83,8 +83,9 @@ delimiter ;
 
 CREATE TABLE assiste(id_joueur int, annee int, num_partie int, instant time,
 	PRIMARY KEY(annee, num_partie, instant),
-	FOREIGN KEY(annee, num_partie, instant) REFERENCES lancer(annee, num_partie, instant),
-	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur));
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES lancer(annee, num_partie, instant)
+		ON DELETE CASCADE,
+	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE);
 
 delimiter //
 CREATE TRIGGER assiste_panier
@@ -125,14 +126,14 @@ CREATE TABLE rebond (annee int, num_partie int, instant time, type_rebond char(2
 
 CREATE TABLE concoure(annee int, num_partie int, num_equipe_loc int, num_equipe_vis int,
 	PRIMARY KEY(annee, num_partie),
-	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie),
-	FOREIGN KEY(num_equipe_loc) REFERENCES equipe(num_equipe),
-	FOREIGN KEY(num_equipe_vis) REFERENCES equipe(num_equipe));
+	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
+	FOREIGN KEY(num_equipe_loc) REFERENCES equipe(num_equipe) ON DELETE CASCADE,
+	FOREIGN KEY(num_equipe_vis) REFERENCES equipe(num_equipe) ON DELETE CASCADE);
 
 CREATE TABLE contrat(num_equipe int, id_joueur int, debut_incl date, fin_excl date, dossard int,
 	PRIMARY KEY(num_equipe, id_joueur, debut_incl),
-	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur),
-	FOREIGN KEY(num_equipe) REFERENCES equipe(num_equipe));
+	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE,
+	FOREIGN KEY(num_equipe) REFERENCES equipe(num_equipe) ON DELETE CASCADE);
 
 delimiter //
 CREATE TRIGGER fin_contrat_null
@@ -256,14 +257,13 @@ IF(  NOT EXISTS(SELECT NULL
     WHERE P.annee = NEW.annee AND P.num_partie = NEW.num_partie
       AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
       AND (Ct.num_equipe = P.num_equipe_loc OR Ct.num_equiple = P.num_equipe_vis) AND Ct.id_joueur = NEW.id_joueur
-      AND debut_incl <= P.date_partie AND P.date_partie < fin_excl
+      AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl
     )
 )
 THEN SET NEW.id_joueur = null;
 END IF;
 END;//
 delimiter ;
-
 
 
 show tables;
