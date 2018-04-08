@@ -252,14 +252,13 @@ CREATE TRIGGER joueur_bonne_equipe
 BEFORE INSERT ON participe
 FOR EACH ROW
 BEGIN
-IF(  NOT EXISTS(SELECT NULL
+IF(SELECT COUNT(*)
      FROM partie P, concoure Cc, contrat Ct
      WHERE P.annee = NEW.annee AND P.num_partie = NEW.num_partie
       AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
       AND (Ct.num_equipe = Cc.num_equipe_loc OR Ct.num_equiple = Cc.num_equipe_vis) AND Ct.id_joueur = NEW.id_joueur
       AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl
-    )
-)
+    ) <> 1
 THEN SET NEW.id_joueur = null;
 END IF;
 END;//
