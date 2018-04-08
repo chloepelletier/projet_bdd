@@ -111,9 +111,6 @@ VALUES	(1,1,'2010-03-12',NULL,1),
 
 INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
 VALUES(2,1,'2012-05-12',NULL,13); /* Doit échouer, contrats en conflit */
-
-/*RENDU ici */
-
 INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
 VALUES(1,13,'2010-03-12','2010-03-12',13); /* Doit échouer, datesincohérentes */
 INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
@@ -124,8 +121,11 @@ INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
 VALUES(1,13,'2010-03-12',NULL,13);
 
 INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
-VALUES(2,14,'2010-03-12',NULL,1),
-VALUES(2,15,'2010-03-12',NULL,2);
+VALUES	(2,14,'2010-03-12',NULL,1),
+	(2,15,'2010-03-12',NULL,2);
+
+/* RENDU ICI Insérer dans participe: */
+
 
 INSERT INTO action (annee, num_partie, instant, type_action, id_joueur)
 VALUES (2018,1,'00:01:30','lancer',1);

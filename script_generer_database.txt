@@ -32,12 +32,14 @@ CREATE TRIGGER max7_parties_par_serie
 BEFORE INSERT ON appartient
 FOR EACH ROW
 BEGIN
-	IF (	SELECT COUNT(*)
-		FROM appartient
-		WHERE annee=NEW.annee AND num_serie = NEW.num_serie
-		) = 7
-	THEN SET NEW.annee = null;
-	END IF;
+IF (NEW.num_sous_serie) > 7
+OR
+(	SELECT COUNT(*)
+	FROM appartient
+	WHERE annee=NEW.annee AND num_serie = NEW.num_serie
+	) = 7
+THEN SET NEW.annee = null;
+END IF;
 END;//
 delimiter ;
 
@@ -58,8 +60,8 @@ CREATE TRIGGER fin_contrat_null
 BEFORE INSERT ON contrat
 FOR EACH ROW
 BEGIN
-	IF (NEW.fin_excl = null)
-	THEN SET NEW.fin_excl = 9999-12-31;
+	IF (NEW.fin_excl IS null)
+	THEN SET NEW.fin_excl = '9999-12-31';
 	END IF;
 END;//
 delimiter ;
