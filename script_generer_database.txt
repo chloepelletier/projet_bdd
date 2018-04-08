@@ -1,14 +1,3 @@
-/*
-SELECT Concat('DROP TRIGGER ', Trigger_Name, ';') FROM  information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = 'your_schema';
-Pour drop tous triggers. Doit utiliser une scheme (connais pas)
-*/
-use basketballer;
-DROP TRIGGER type_action_lancer;
-DROP TRIGGER assiste_panier;
-DROP TRIGGER date_coherentes;
-DROP TRIGGER max_1_dossard;
-DROP TRIGGER max_1_contrat;
-DROP TRIGGER joueur_bonne_equipe;
 DROP DATABASE basketballer;
 create database basketballer;
 use basketballer;
@@ -34,8 +23,24 @@ CREATE TABLE serie (annee int, num_serie int, PRIMARY KEY(annee, num_serie));
 
 CREATE TABLE appartient(annee int, num_partie int, num_serie int, num_sous_serie int,
 	PRIMARY KEY(annee, num_partie),
+	UNIQUE (annee, num_serie, num_sous_serie),
 	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
 	FOREIGN KEY(annee, num_serie) REFERENCES serie(annee, num_serie) ON DELETE CASCADE);
+
+delimiter //
+CREATE TRIGGER max7_parties_par_serie
+BEFORE INSERT ON appartient
+FOR EACH ROW
+BEGIN
+	IF (	SELECT COUNT(*)
+		FROM appartient
+		WHERE annee=NEW.annee AND num_serie = NEW.num_serie
+		) = 7
+	THEN SET NEW.annee = null;
+	END IF;
+END;//
+delimiter ;
+
 
 CREATE TABLE type_action(type char(20), PRIMARY KEY(type));
 INSERT INTO type_action VALUES ("lancer"), ("revirement"), ("faute"), ("rebond");

@@ -1,3 +1,12 @@
+DELETE FROM equipe;
+DELETE FROM joueur;
+DELETE FROM partie;
+DELETE FROM concoure;
+DELETE FROM serie;
+DELETE FROM action;
+DELETE FROM appartient;
+DELETE FROM contrat;
+
 
 
 INSERT INTO equipe(num_equipe int, nom_equipe, ville, pays, fondation)
@@ -87,7 +96,7 @@ VALUES (19,'matheo','muzoti','2000-05-02',6.3,175,'arriere',true,6.1);
 
 INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
 		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (20,'leo','gago','1997-08-22',6.5,'meneur',false,7);
+VALUES (20,'leo','gago','1997-08-22',6.5, 180,'meneur',false,7);
 
 INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
 		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
@@ -95,7 +104,7 @@ VALUES (21,'jack','luti','1999-05-09',6.3,175,'pivot',true,6.1);
 
 INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
 		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (22,'henri','lune','1998-09-22',6.5,'allie',false,6.5);
+VALUES (22,'henri','lune','1998-09-22',6.5, 150,'allie',false,6.5);
 
 INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
 		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
@@ -103,7 +112,7 @@ VALUES (23,'antoine','grizman','1990-06-09',6.3,175,'pivot',true,6.1);
 
 INSERT INTO joueur(id_joueur, prenom,nom_famille, naissance,
 		 taille_ft,poids_lbs,role,est_droitier,dist_bras_ft)
-VALUES (24,'malik','kose','1990-10-22',6.5,'allie fort',true,6.5);
+VALUES (24,'malik','kose','1990-10-22',6.5,100,'allie fort',true,6.5);
 
 
 INSERT INTO partie (annee, num_partie, ville, date_partie) 
@@ -147,6 +156,8 @@ VALUES (5,2018,1,'00:01:30');
 
 INSERT INTO action (annee, num_partie, instant, type_action, id_joueur)
 VALUES (2018,1,'00:10:30','revirement');
+
+/* Manque les joueurs ayant fait l'action. S'assurer que joueur était dans la partie) */
 
 INSERT INTO revirement (annee, num_partie, instant, type_revirement)
 VALUES (2018,1,'00:10:30','offensif');
