@@ -132,14 +132,13 @@ IF(SELECT COUNT(*)
      FROM partie P, concoure Cc, contrat Ct
      WHERE P.annee = NEW.annee AND P.num_partie = NEW.num_partie
       AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
-      AND (Ct.num_equipe = Cc.num_equipe_loc OR Ct.num_equiple = Cc.num_equipe_vis) AND Ct.id_joueur = NEW.id_joueur
+      AND (Ct.num_equipe = Cc.num_equipe_loc OR Ct.num_equipe = Cc.num_equipe_vis) AND Ct.id_joueur = NEW.id_joueur
       AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl
     ) <> 1
 THEN SET NEW.id_joueur = null;
 END IF;
 END;//
 delimiter ;
-
 
 delimiter //
 CREATE TRIGGER 12_joueurs_par_equipe
@@ -152,9 +151,9 @@ IF	(SELECT COUNT(Ct2.id_joueur)
     	 AND Pp.annee = NEW.annee AND Pp.num_partie = NEW.num_partie
      	 AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
      	 AND Ct1.num_equipe = Cc.num_equipe_loc AND Ct1.id_joueur = NEW.id_joueur 
-     	 AND Ct1.debut_incl <= P.date_partie AND P.date_partie < Ct1.fin_excl
+     	 AND Ct1.debut_incl <= Pe.date_partie AND Pe.date_partie < Ct1.fin_excl
 	 AND Ct2.num_equipe = Ct1.num_equipe AND Ct2.id_joueur = Pp.id_joueur
-	 AND Ct2.debut_incl <= P.date_partie AND P.date_partie < Ct2.fin_excl
+	 AND Ct2.debut_incl <= Pe.date_partie AND Pe.date_partie < Ct2.fin_excl
 	) = 12 
 THEN SET NEW.id_joueur = null;
 END IF;

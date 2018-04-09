@@ -124,14 +124,44 @@ INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
 VALUES	(2,14,'2010-03-12',NULL,1),
 	(2,15,'2010-03-12',NULL,2);
 
-/* RENDU ICI Insérer dans participe: */
+INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
+VALUES	(3,16,'2010-03-12',NULL,1);
 
+
+INSERT INTO participe(id_joueur, annee, num_partie , minutes)
+VALUES(16,2018,1,30); /* Doit échouer, jouer aps dans bonne equipe */
+
+INSERT INTO participe(id_joueur, annee, num_partie , minutes)
+VALUES	(1,2018,1,30),
+	(2,2018,1,30),
+	(3,2018,1,30),
+	(4,2018,1,30),
+	(5,2018,1,30),
+	(6,2018,1,30),
+	(7,2018,1,30),
+	(8,2018,1,30),
+	(9,2018,1,30),
+	(10,2018,1,30),
+	(11,2018,1,30),
+	(12,2018,1,30);
+INSERT INTO participe(id_joueur, annee, num_partie , minutes)
+VALUES	(13,2018,1,30); /* Doit échouer, 13e joueur */
+
+INSERT INTO participe(id_joueur, annee, num_partie , minutes)
+VALUES	(14,2018,1,30);
+
+
+INSERT INTO action (annee, num_partie, instant, type_action, id_joueur)
+VALUES (2018,1,'00:01:30','lancer',13); /* Doit échouer, participe pas */
 
 INSERT INTO action (annee, num_partie, instant, type_action, id_joueur)
 VALUES (2018,1,'00:01:30','lancer',1);
 
 INSERT INTO lancer (annee, num_partie, instant, type_lancer, est_panier)
 VALUES (2018,1,'00:01:30','2pt',true);
+
+INSERT INTO assiste(id_joueur,annee,num_partie,instant)
+VALUES (13,2018,1,'00:01:30');/* Doit échouer, participe pas */
 
 INSERT INTO assiste(id_joueur,annee,num_partie,instant)
 VALUES (5,2018,1,'00:01:30');
