@@ -115,8 +115,8 @@ delimiter ;
 
 CREATE TABLE participe(id_joueur int, annee int, num_partie int, minutes int,
 	PRIMARY KEY(annee, num_partie, id_joueur),
-	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie),
-	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur));
+	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
+	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE);
 /* Peut fortement changer
    Trigger: Juste des joueurs d'une des deux équipes
    Ajouter trigger maximum de 12 joueurs par equipe (minimum?-> aucun))
@@ -215,8 +215,7 @@ CREATE TRIGGER assiste_panier
 BEFORE INSERT ON assiste
 FOR EACH ROW
 BEGIN
-	IF (
-		SELECT est_panier
+	IF (	SELECT est_panier
 		FROM lancer
 		WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
 	 = false
@@ -225,6 +224,27 @@ BEGIN
 END;//
 delimiter ;
 /* Ajouter 1 autre pour update? */
+
+delimiter //
+CREATE TRIGGER assiste_mauvaise_equipe
+BEFORE INSERT ON assiste
+FOR EACH ROW
+BEGIN
+IF(SELECT COUNT(*)
+     FROM action A, partie P, contrat Ct1, contrat Ct2
+     WHERE  A.annee = NEW.annee AND A.num_partie = NEW.num_partie AND A.instant = NEW.instant
+	AND P.annee = NEW.annee AND P.num_partie = NEW.num_partie
+      	AND Ct1.id_joueur = A.id_joueur
+      	AND Ct1.debut_incl <= P.date_partie AND P.date_partie < Ct1.fin_excl
+	AND Ct2.num_equipe = Ct1.num_equipe AND Ct2.id_joueur = NEW.id_joueur
+	AND Ct2.debut_incl <= P.date_partie AND P.date_partie < Ct2.fin_excl
+    ) = 0	
+THEN SET NEW.id_joueur = null;
+END IF;
+END;//
+delimiter ;
+/*Marche aps car id_joueur permis d'être null (étrange, car cest une foreign key)
+À cause de pas de 'ON DELETE CASCADE' dans participe???Semble pas */
 
 CREATE TABLE type_faute(type char(20), PRIMARY KEY(type));
 INSERT INTO type_faute VALUES ("offensif"), ("defensif");

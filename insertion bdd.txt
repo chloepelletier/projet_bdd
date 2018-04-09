@@ -162,7 +162,8 @@ VALUES (2018,1,'00:01:30','2pt',true);
 
 INSERT INTO assiste(id_joueur,annee,num_partie,instant)
 VALUES (13,2018,1,'00:01:30');/* Doit échouer, participe pas */
-
+INSERT INTO assiste(id_joueur,annee,num_partie,instant)
+VALUES (14,2018,1,'00:01:30');/* Doit échouer, assiste mauvaise equipe */
 INSERT INTO assiste(id_joueur,annee,num_partie,instant)
 VALUES (5,2018,1,'00:01:30');
 
