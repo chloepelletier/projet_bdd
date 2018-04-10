@@ -1,0 +1,210 @@
+use basketballer;
+
+show tables;
+
+/*SEULEMENT les triggers update pour l'instant */
+
+
+delimiter //
+CREATE TRIGGER max7_parties_par_serie_u
+BEFORE UPDATE ON appartient
+FOR EACH ROW
+BEGIN
+IF (NEW.num_sous_serie) > 7
+OR
+((NEW.annee <> OLD.annee OR NEW.num_serie <> OLD.num_serie)	
+AND    (SELECT COUNT(*)
+	FROM appartient
+	WHERE annee=NEW.annee AND num_serie = NEW.num_serie
+	) = 7)
+THEN SET NEW.annee = null;
+END IF;
+END;//
+delimiter ;
+
+/* rendu ici */
+
+delimiter //
+CREATE TRIGGER fin_contrat_null_u
+BEFORE UPDATE ON contrat
+FOR EACH ROW
+BEGIN
+	IF (NEW.fin_excl IS null)
+	THEN SET NEW.fin_excl = '9999-12-31';
+	END IF;
+END;//
+delimiter ;
+
+delimiter //
+CREATE TRIGGER date_coherentes_u
+BEFORE UPDATE ON contrat
+FOR EACH ROW
+BEGIN
+  IF ( NEW.fin_excl <= NEW.debut_incl )
+  THEN SET NEW.debut_incl = null;
+  END IF;
+END;//
+delimiter ;
+
+delimiter //
+CREATE TRIGGER max_1_dossard_u
+BEFORE UPDATE ON contrat
+FOR EACH ROW
+BEGIN
+  IF(SELECT COUNT(*)
+    FROM contrat
+    WHERE num_equipe = NEW.num_equipe
+      AND debut_incl < NEW.fin_excl AND NEW.debut_incl < fin_excl
+      AND dossard = NEW.dossard
+    ) > 0
+  THEN SET NEW.debut_incl = null;
+  END IF;
+END;//
+delimiter ;
+
+
+delimiter //
+CREATE TRIGGER max_1_contrat_u
+BEFORE UPDATE ON contrat
+FOR EACH ROW
+BEGIN
+IF (
+  SELECT COUNT(*)
+  FROM contrat
+  WHERE id_joueur = NEW.id_joueur
+    AND debut_incl < NEW.fin_excl AND NEW.debut_incl < fin_excl
+  ) > 0
+THEN SET NEW.debut_incl = null;
+END IF;
+END;//
+delimiter ;
+
+
+delimiter //
+CREATE TRIGGER joueur_bonne_equipe_u
+BEFORE UPDATE ON participe
+FOR EACH ROW
+BEGIN
+IF(SELECT COUNT(*)
+     FROM partie P, concoure Cc, contrat Ct
+     WHERE P.annee = NEW.annee AND P.num_partie = NEW.num_partie
+      AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
+      AND (Ct.num_equipe = Cc.num_equipe_loc OR Ct.num_equipe = Cc.num_equipe_vis) AND Ct.id_joueur = NEW.id_joueur
+      AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl
+    ) <> 1
+THEN SET NEW.id_joueur = null;
+END IF;
+END;//
+delimiter ;
+
+delimiter //
+CREATE TRIGGER 12_joueurs_par_equipe_u
+BEFORE UPDATE ON participe
+FOR EACH ROW
+BEGIN
+IF	(SELECT COUNT(Ct2.id_joueur)
+	FROM partie Pe, participe Pp, concoure Cc, contrat Ct1, contrat ct2
+    	WHERE Pe.annee = NEW.annee AND Pe.num_partie = NEW.num_partie
+    	 AND Pp.annee = NEW.annee AND Pp.num_partie = NEW.num_partie
+     	 AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
+     	 AND Ct1.num_equipe = Cc.num_equipe_loc AND Ct1.id_joueur = NEW.id_joueur 
+     	 AND Ct1.debut_incl <= Pe.date_partie AND Pe.date_partie < Ct1.fin_excl
+	 AND Ct2.num_equipe = Ct1.num_equipe AND Ct2.id_joueur = Pp.id_joueur
+	 AND Ct2.debut_incl <= Pe.date_partie AND Pe.date_partie < Ct2.fin_excl
+	) = 12 
+THEN SET NEW.id_joueur = null;
+END IF;
+END;//
+delimiter ;
+
+
+delimiter //
+CREATE TRIGGER assiste_panier_u
+BEFORE UPDATE ON assiste
+FOR EACH ROW
+BEGIN
+	IF (	SELECT est_panier
+		FROM lancer
+		WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
+	 = false
+	THEN SET NEW.instant = null;
+	END IF;
+END;//
+delimiter ;
+
+delimiter //
+CREATE TRIGGER assiste_mauvaise_equipe_u
+BEFORE UPDATE ON assiste
+FOR EACH ROW
+BEGIN
+IF(SELECT COUNT(*)
+     FROM action A, partie P, contrat Ct1, contrat Ct2
+     WHERE  A.annee = NEW.annee AND A.num_partie = NEW.num_partie AND A.instant = NEW.instant
+	AND P.annee = NEW.annee AND P.num_partie = NEW.num_partie
+      	AND Ct1.id_joueur = A.id_joueur
+      	AND Ct1.debut_incl <= P.date_partie AND P.date_partie < Ct1.fin_excl
+	AND Ct2.num_equipe = Ct1.num_equipe AND Ct2.id_joueur = NEW.id_joueur
+	AND Ct2.debut_incl <= P.date_partie AND P.date_partie < Ct2.fin_excl
+    ) = 0	
+THEN SET NEW.instant = null;
+END IF;
+END;//
+delimiter ;
+
+
+delimiter //
+CREATE TRIGGER type_action_lancer_u
+BEFORE UPDATE ON lancer
+FOR EACH ROW
+BEGIN
+	IF (	SELECT type_action
+		FROM action
+		WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
+	 <> "lancer"
+	THEN SET NEW.instant = null;
+	END IF;
+END;//
+delimiter ;
+
+delimiter //
+CREATE TRIGGER type_action_revirement_u
+BEFORE UPDATE ON revirement
+FOR EACH ROW
+BEGIN
+	IF (	SELECT type_action
+		FROM action
+		WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
+	 <> "revirement"
+	THEN SET NEW.instant = null;
+	END IF;
+END;//
+delimiter ;
+
+delimiter //
+CREATE TRIGGER type_action_faute_u
+BEFORE UPDATE ON faute
+FOR EACH ROW
+BEGIN
+	IF (	SELECT type_action
+		FROM action
+		WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
+	 <> "faute"
+	THEN SET NEW.instant = null;
+	END IF;
+END;//
+delimiter ;
+
+delimiter //
+CREATE TRIGGER type_action_rebond_u
+BEFORE UPDATE ON rebond
+FOR EACH ROW
+BEGIN
+	IF (	SELECT type_action
+		FROM action
+		WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
+	 <> "rebond"
+	THEN SET NEW.instant = null;
+	END IF;
+END;//
+delimiter ;
+

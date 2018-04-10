@@ -165,7 +165,7 @@ VALUES (13,2018,1,'00:01:30');/* Doit échouer, participe pas */
 INSERT INTO assiste(id_joueur,annee,num_partie,instant)
 VALUES (100,2018,1,'00:01:30');/* Doit échouer, n'existe pas */
 INSERT INTO assiste(id_joueur,annee,num_partie,instant)
-VALUES (null,2018,1,'00:01:30');/* Doit échouer, null */
+VALUES (null,2018,1,'00:01:30');/* Doit échouer, null. SEULEMENT SI 'NOT NULL' */
 INSERT INTO assiste(id_joueur,annee,num_partie,instant)
 VALUES (14,2018,1,'00:01:30');/* Doit échouer, assiste mauvaise equipe */
 INSERT INTO assiste(id_joueur,annee,num_partie,instant)
@@ -203,4 +203,8 @@ VALUES (2018,1,'00:25:32','rebond',4);
 INSERT INTO rebond (annee, num_partie, instant, type_rebond)
 VALUES (2018,1,'00:25:32','defensif');
 
+/* Tests d'update */
+
+UPDATE appartient SET annee=2018 WHERE annee=2017 AND num_partie = 1;
+/*Doit échouer, on aurait plus de 7 parties*/
 
