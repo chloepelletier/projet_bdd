@@ -51,7 +51,7 @@ CREATE TABLE concoure(annee int, num_partie int, num_equipe_loc int, num_equipe_
 	FOREIGN KEY(num_equipe_vis) REFERENCES equipe(num_equipe) ON DELETE CASCADE);
 
 CREATE TABLE contrat(num_equipe int, id_joueur int, debut_incl date, fin_excl date, dossard int,
-	PRIMARY KEY(num_equipe, id_joueur, debut_incl),
+	PRIMARY KEY(id_joueur, debut_incl),
 	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE,
 	FOREIGN KEY(num_equipe) REFERENCES equipe(num_equipe) ON DELETE CASCADE);
 
