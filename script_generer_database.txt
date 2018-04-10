@@ -209,6 +209,7 @@ CREATE TABLE assiste(id_joueur int, annee int, num_partie int, instant time,
 		ON DELETE CASCADE,
 	FOREIGN KEY(annee, num_partie,id_joueur) REFERENCES participe(annee, num_partie,id_joueur)
 		ON DELETE CASCADE);
+/* Mettre NOT NULL à id_joueur? */
 
 delimiter //
 CREATE TRIGGER assiste_panier
@@ -239,12 +240,11 @@ IF(SELECT COUNT(*)
 	AND Ct2.num_equipe = Ct1.num_equipe AND Ct2.id_joueur = NEW.id_joueur
 	AND Ct2.debut_incl <= P.date_partie AND P.date_partie < Ct2.fin_excl
     ) = 0	
-THEN SET NEW.id_joueur = null;
+THEN SET NEW.instant = null;
 END IF;
 END;//
 delimiter ;
-/*Marche aps car id_joueur permis d'être null (étrange, car cest une foreign key)
-À cause de pas de 'ON DELETE CASCADE' dans participe???Semble pas */
+
 
 CREATE TABLE type_faute(type char(20), PRIMARY KEY(type));
 INSERT INTO type_faute VALUES ("offensif"), ("defensif");

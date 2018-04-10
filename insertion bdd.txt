@@ -1,11 +1,13 @@
 DELETE FROM equipe;
 DELETE FROM joueur;
 DELETE FROM partie;
-DELETE FROM concoure;
 DELETE FROM serie;
-DELETE FROM action;
 DELETE FROM appartient;
 DELETE FROM contrat;
+DELETE FROM concoure;
+DELETE FROM participe;
+DELETE FROM action;
+
 
 
 INSERT INTO equipe(num_equipe, nom_equipe, ville, pays, fondation)
@@ -153,15 +155,17 @@ VALUES	(14,2018,1,30);
 
 INSERT INTO action (annee, num_partie, instant, type_action, id_joueur)
 VALUES (2018,1,'00:01:30','lancer',13); /* Doit échouer, participe pas */
-
 INSERT INTO action (annee, num_partie, instant, type_action, id_joueur)
 VALUES (2018,1,'00:01:30','lancer',1);
-
 INSERT INTO lancer (annee, num_partie, instant, type_lancer, est_panier)
 VALUES (2018,1,'00:01:30','2pt',true);
 
 INSERT INTO assiste(id_joueur,annee,num_partie,instant)
 VALUES (13,2018,1,'00:01:30');/* Doit échouer, participe pas */
+INSERT INTO assiste(id_joueur,annee,num_partie,instant)
+VALUES (100,2018,1,'00:01:30');/* Doit échouer, n'existe pas */
+INSERT INTO assiste(id_joueur,annee,num_partie,instant)
+VALUES (null,2018,1,'00:01:30');/* Doit échouer, null */
 INSERT INTO assiste(id_joueur,annee,num_partie,instant)
 VALUES (14,2018,1,'00:01:30');/* Doit échouer, assiste mauvaise equipe */
 INSERT INTO assiste(id_joueur,annee,num_partie,instant)
@@ -198,7 +202,5 @@ VALUES (2018,1,'00:25:32','rebond',4);
 
 INSERT INTO rebond (annee, num_partie, instant, type_rebond)
 VALUES (2018,1,'00:25:32','defensif');
-
-/* Verif rendue ici. joueu faisant action doit etre dans 'participe', pas 'joueur' */
 
 
