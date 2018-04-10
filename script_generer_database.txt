@@ -117,11 +117,6 @@ CREATE TABLE participe(id_joueur int, annee int, num_partie int, minutes int,
 	PRIMARY KEY(annee, num_partie, id_joueur),
 	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
 	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE);
-/* Peut fortement changer
-   Trigger: Juste des joueurs d'une des deux équipes
-   Ajouter trigger maximum de 12 joueurs par equipe (minimum?-> aucun))
-   Potentiellement, faire en même temps (plus efficace)
-*/
 
 delimiter //
 CREATE TRIGGER joueur_bonne_equipe
@@ -254,19 +249,58 @@ CREATE TABLE revirement (annee int, num_partie int, instant time, type_reviremen
 	FOREIGN KEY(type_revirement) REFERENCES type_faute(type),
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
 		ON DELETE CASCADE);
+delimiter //
+CREATE TRIGGER type_action_revirement
+BEFORE INSERT ON revirement
+FOR EACH ROW
+BEGIN
+	IF (	SELECT type_action
+		FROM action
+		WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
+	 <> "revirement"
+	THEN SET NEW.instant = null;
+	END IF;
+END;//
+delimiter ;
 
 CREATE TABLE faute (annee int, num_partie int, instant time, type_faute char(20),
 	PRIMARY KEY(annee, num_partie, instant),
 	FOREIGN KEY(type_faute) REFERENCES type_faute(type),
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
 		ON DELETE CASCADE);
+delimiter //
+CREATE TRIGGER type_action_faute
+BEFORE INSERT ON faute
+FOR EACH ROW
+BEGIN
+	IF (	SELECT type_action
+		FROM action
+		WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
+	 <> "faute"
+	THEN SET NEW.instant = null;
+	END IF;
+END;//
+delimiter ;
+
 
 CREATE TABLE rebond (annee int, num_partie int, instant time, type_rebond char(20),
 	PRIMARY KEY(annee, num_partie, instant),
 	FOREIGN KEY(type_rebond) REFERENCES type_faute(type),
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant) 
 		ON DELETE CASCADE);
-
+delimiter //
+CREATE TRIGGER type_action_rebond
+BEFORE INSERT ON rebond
+FOR EACH ROW
+BEGIN
+	IF (	SELECT type_action
+		FROM action
+		WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
+	 <> "rebond"
+	THEN SET NEW.instant = null;
+	END IF;
+END;//
+delimiter ;
 
 
 show tables;
