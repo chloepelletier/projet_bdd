@@ -37,33 +37,8 @@ def getJoueur(id=None):
     else : 
         info3=("inconnu","inconnu","inconnu","inconnu")
         info2=("inconnu","inconnu","inconnu","inconnu","inconnu")
-    
-    #nombre de match joués dans la saison. Enregistré dans variable nb_partie */
-    cmd4="SELECT COUNT(*), SUM(P.minutes) FROM participe P WHERE P.id_joueur =" +id+ "AND P.annee=2018;"
-    cur.execute(cmd)
-    infoParticipe = cur.fetchone()
-    nb_partie = infoParticipe[0]
-    nb_minute = infoParticipe[1]
-    #Moyenne des assists  par partie
-    cmd5='SELECT COUNT(*) FROM  assiste A WHERE A.annee=2018 AND A.id_joueur='+id+';'
-    cur.execute(cmd5)
-    nb_assiste = cur.fetchone()[0]
-    moy_assiste = nb_assiste / nb_partie
-    #action 
-    cmd6 = 'SELECT * FROM  action A WHERE A.annee=2018 AND A.id_joueur='+id+';'
-    cur.execute(cmd6)
-    action = cur.fetchall()
-    #Moyenne des rebonds et fautes par partie
-    nb_rebond = 0
-    nb_faute = 0
-    for Tuple in action:
-        if Tuple[3] == "rebond":
-            nb_rebond +=1
-        if Tuple[3] == "faute" :
-            nb_faute +=1
-    moy_rebond = nb_rebond / nb_partie
-    moy_faute = nb_faute / nb_partie
-    #lancer 
+
+    #Tout init à 0
     nb_revirement_p = 0
     nb_revirement_n = 0
     nb_lancer_1pt = 0
@@ -72,42 +47,81 @@ def getJoueur(id=None):
     nb_panier_1pt = 0
     nb_panier_2pt = 0
     nb_panier_3pt = 0
-    for Tuple in action :
-        if Tuple[3] == "lancer" :
-            cmd7 = 'SELECT R.type_lancer, R.est_panier FROM lancer L WHERE L.annee='+str(Tuple[0])+' AND L.num_partie='+str(Tuple[1])+' AND L.instant= '+str(Tuple[2])+';'
-            cur.execute(cmd7)
-            lancer = cur.fetchone()
-            if lancer[0] == "1pt":
-                nb_lancer_1pt +=1
-                if (lancer[1]):
-                    nb_panier_1pt +=1
-            elif lancer[0] == "2pt" :
-                nb_lancer_2pt +=1
-                if (lancer[1]) :
-                    nb_panier_2pt +=1
-            elif lancer[0] == "3pt" :
-                nb_lancer_3pt +=1
-                if (lancer[1]):
-                    nb_panier_3pt +=1
-		
-        if Tuple[3] == "revirement":
-            cmd8 = 'SELECT R.type_revirement FROM revirement R WHERE R.annee='+str(Tuple[0])+' AND R.num_partie='+str(Tuple[1])+' AND R.instant= '+str(Tuple[2])+';'
-            cur.execute(cmd8)
-            revirement = cur.fetchone()
-            if revirement[0] == "offensif":
-                nb_revirement_p +=1
-            elif revirement[0] == "defensif":
-                nb_revirement_n +=1
-                
-    moy_vol_balle = nb_revirement_p / nb_partie
-    moy_revirement = nb_revirement_n / nb_partie
-    nb_point =  1*nb_panier_1pt + 2*nb_panier_2pt +3*nb_panier_3pt
-    moy_point = nb_point / nb_partie
-    pourcentage_lancer_franc = nb_panier_1pt / nb_lancer_1pt
-    pourcentage_2pt = nb_panier_2pt / nb_lancer_2pt
-    pourcentage_3pt = nb_panier_3pt / nb_lancer_3pt
-    moy_min = nb_minute /nb_partie
+    moy_assiste = 0
+    moy_vol_balle = 0
+    moy_revirement = 0
+    nb_point =  0
+    moy_point = 0
+    pourcentage_lancer_franc = 0
+    pourcentage_2pt = 0
+    pourcentage_3pt = 0
+    moy_min = 0
 
+    #nombre de match joués dans la saison. Enregistré dans variable nb_partie */
+    cmd4="SELECT COUNT(*), SUM(P.minutes) FROM participe P WHERE P.id_joueur =" +id+ " AND P.annee=2018;"
+    cur.execute(cmd4)
+    infoParticipe = cur.fetchone()
+    nb_partie = infoParticipe[0]
+    nb_minute = infoParticipe[1] #
+    if(nb_partie) :
+        moy_min = nb_minute / nb_partie
+        #Moyenne des assists  par partie
+        cmd5='SELECT COUNT(*) FROM  assiste A WHERE A.annee=2018 AND A.id_joueur='+id+';'
+        cur.execute(cmd5)
+        nb_assiste = cur.fetchone()[0]
+        #action
+        cmd6 = 'SELECT * FROM  action A WHERE A.annee=2018 AND A.id_joueur='+id+';'
+        cur.execute(cmd6)
+        action = cur.fetchall()
+        #Moyenne des rebonds et fautes par partie
+        nb_rebond = 0
+        nb_faute = 0
+        for Tuple in action:
+            if Tuple[3] == "rebond":
+                nb_rebond +=1
+            if Tuple[3] == "faute" :
+                nb_faute +=1
+        moy_rebond = nb_rebond / nb_partie
+        moy_faute = nb_faute / nb_partie
+        #lancers e trevirements:
+        for Tuple in action :
+            if Tuple[3] == "lancer" :
+                cmd7 = 'SELECT L.type_lancer, L.est_panier FROM lancer L WHERE L.annee='+str(Tuple[0])+' AND L.num_partie='+str(Tuple[1])+' AND L.instant= "'+str(Tuple[2])+'";'
+                cur.execute(cmd7)
+                lancer = cur.fetchone()
+                if lancer[0] == "1pt":
+                    nb_lancer_1pt +=1
+                    if (lancer[1]):
+                        nb_panier_1pt +=1
+                elif lancer[0] == "2pt" :
+                    nb_lancer_2pt +=1
+                    if (lancer[1]) :
+                        nb_panier_2pt +=1
+                elif lancer[0] == "3pt" :
+                    nb_lancer_3pt +=1
+                    if (lancer[1]):
+                        nb_panier_3pt +=1
+
+            if Tuple[3] == "revirement":
+                cmd8 = 'SELECT R.type_revirement FROM revirement R WHERE R.annee='+str(Tuple[0])+' AND R.num_partie='+str(Tuple[1])+' AND R.instant= "'+str(Tuple[2])+'";'
+                cur.execute(cmd8)
+                revirement = cur.fetchone()
+                if revirement[0] == "offensif":
+                    nb_revirement_p +=1
+                elif revirement[0] == "defensif":
+                    nb_revirement_n +=1
+
+        moy_assiste = nb_assiste / nb_partie
+        moy_vol_balle = nb_revirement_p / nb_partie
+        moy_revirement = nb_revirement_n / nb_partie
+        nb_point =  1*nb_panier_1pt + 2*nb_panier_2pt +3*nb_panier_3pt
+        moy_point = nb_point / nb_partie
+        if(nb_lancer_1pt) :
+            pourcentage_lancer_franc = nb_panier_1pt / nb_lancer_1pt #prob de division par zéro hahaha
+        if(nb_lancer_2pt) :
+            pourcentage_2pt = nb_panier_2pt / nb_lancer_2pt
+        if (nb_lancer_3pt):
+            pourcentage_3pt = nb_panier_3pt / nb_lancer_3pt
 
     return render_template('joueur.html', prenom=info[1], nom=info[2],
                            naissance= info[3], taille=info[4], poids=info[5], 
@@ -119,7 +133,7 @@ def getJoueur(id=None):
                            pourcentage_2pt=pourcentage_2pt,pourcentage_3pt=pourcentage_3pt,
                            moy_min = moy_min)
   
-        
+
 
 #=========================
 
@@ -156,8 +170,10 @@ def getEquipe(id=None):
         id_joueur = id_joueur + (info2[i][0], )
     if(len(id_joueur)==1) : 
         id_joueur="("+ str(id_joueur[0])+")"
+
     if (id_joueur) :
-        cmd3="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom,joueur.role, contrat.dossard FROM joueur, contrat WHERE joueur.id_joueur = contrat.id_joueur AND joueur.id_joueur IN "+str(id_joueur)+";"
+        cmd3="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom,joueur.role, contrat.dossard FROM joueur," \
+             "contrat WHERE joueur.id_joueur = contrat.id_joueur AND joueur.id_joueur IN "+str(id_joueur)+";"
         cur.execute(cmd3)
         infoJoueur = cur.fetchall()
     else : 
@@ -165,7 +181,6 @@ def getEquipe(id=None):
     return render_template('equipe.html', nom=info[1], ville=info[2],pays=info[3],fondation=info[4],
                            infoPartie=infoPartie, infoJoueur=infoJoueur)
 
-#==================================
 
 
 

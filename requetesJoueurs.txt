@@ -12,6 +12,7 @@ cur.execute(cmd)
 infoParticipe = cur.fetchone()
 nb_partie = infoParticipe[0]
 nb_minute = infoParticipe[1]
+moy_min = nb_minute /nb_partie
 
 
 /* Moyenne des assists  par partie */
