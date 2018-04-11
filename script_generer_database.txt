@@ -22,8 +22,8 @@ CREATE TABLE partie (annee int, num_partie int, ville char(20), date_partie date
 CREATE TABLE serie (annee int, num_serie int, PRIMARY KEY(annee, num_serie));
 
 CREATE TABLE appartient(annee int, num_partie int, num_serie int NOT NULL, num_sous_serie int NOT NULL,
-	PRIMARY KEY(annee, num_partie),
-	UNIQUE (annee, num_serie, num_sous_serie),
+	PRIMARY KEY(annee, num_serie, num_sous_serie),
+	UNIQUE (annee, num_partie),
 	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
 	FOREIGN KEY(annee, num_serie) REFERENCES serie(annee, num_serie) ON DELETE CASCADE);
 
@@ -52,6 +52,7 @@ CREATE TABLE concoure(annee int, num_partie int, num_equipe_loc int NOT NULL, nu
 
 CREATE TABLE contrat(num_equipe int NOT NULL, id_joueur int, debut_incl date, fin_excl date, dossard int,
 	PRIMARY KEY(id_joueur, debut_incl),
+	UNIQUE (num_equipe, debut_incl, dossard),
 	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE,
 	FOREIGN KEY(num_equipe) REFERENCES equipe(num_equipe) ON DELETE CASCADE);
 
@@ -171,7 +172,7 @@ INSERT INTO type_lancer VALUES ("1pt"), ("2pt"), ("3pt");
 
 CREATE TABLE lancer (annee int, num_partie int, instant time, type_lancer char(20) NOT NULL, est_panier bool NOT NULL,
 	PRIMARY KEY(annee, num_partie, instant),
-	FOREIGN KEY(type_lancer) REFERENCES type_lancer(type) NOT NULL,
+	FOREIGN KEY(type_lancer) REFERENCES type_lancer(type),
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
 		ON DELETE CASCADE);
 delimiter //
