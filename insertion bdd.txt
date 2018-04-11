@@ -148,9 +148,12 @@ VALUES	(1,2018,1,30),
 	(12,2018,1,30);
 INSERT INTO participe(id_joueur, annee, num_partie , minutes)
 VALUES	(13,2018,1,30); /* Doit échouer, 13e joueur */
+INSERT INTO participe(id_joueur, annee, num_partie , minutes)
+VALUES	(15,2018,1,-30); /*Doit échouer, temps négatif */
 
 INSERT INTO participe(id_joueur, annee, num_partie , minutes)
 VALUES	(14,2018,1,30);
+
 
 
 INSERT INTO action (annee, num_partie, instant, type_action, id_joueur)
@@ -207,4 +210,26 @@ VALUES (2018,1,'00:25:32','defensif');
 
 UPDATE appartient SET annee=2018 WHERE annee=2017 AND num_partie = 1;
 /*Doit échouer, on aurait plus de 7 parties*/
+
+
+/* Pour vérifier le gagnant d'une partie */
+INSERT INTO action (annee, num_partie, instant, type_action, id_joueur)
+VALUES (2018,1,'04:06:30','lancer',4);
+INSERT INTO lancer (annee, num_partie, instant, type_lancer, est_panier)
+VALUES (2018,1,'04:06:30','3pt',true);
+
+INSERT INTO action (annee, num_partie, instant, type_action, id_joueur)
+VALUES (2018,1,'05:16:30','lancer',2);
+INSERT INTO lancer (annee, num_partie, instant, type_lancer, est_panier)
+VALUES (2018,1,'05:16:30','1pt',true);
+
+INSERT INTO action (annee, num_partie, instant, type_action, id_joueur)
+VALUES (2018,1,'08:06:30','lancer',7);
+INSERT INTO lancer (annee, num_partie, instant, type_lancer, est_panier)
+VALUES (2018,1,'08:06:30','1pt',true);
+
+INSERT INTO action (annee, num_partie, instant, type_action, id_joueur)
+VALUES (2018,1,'08:06:25','lancer',14);
+INSERT INTO lancer (annee, num_partie, instant, type_lancer, est_panier)
+VALUES (2018,1,'08:06:25','1pt',true);
 
