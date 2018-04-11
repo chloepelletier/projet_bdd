@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+  <link href='../static/joueur.css' rel='stylesheet' type='text/css'>
+  <title>Equipe</title>
+</head>
+<body>
+  <div class="container">
+  <header>
+    <h2><a href="/"> BasketStats</a></h2>
+    <nav>
+      <ul>
+        <li>
+          <a href="/" title="Recherche"> Retour à la recherche</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+    <div class="equipe">
+      <div class="action">
+        <h1> <span class="info">{{nom}}</span></h1>
+        <button> Ajouter à mes favoris</button>
+      </div>
+      <div class="general">
+       <h2> Informations générales : </h2>
+       <p> Pays de l'équipe : <span class="info"> {{pays}} </span> </p>
+       <p> Ville de l'équipe' : <span class="info">{{ville}} </span></p>
+       <p> Date de fondation de l'équipe : <span class="info">{{fondation}}</span> </p>
+      </div>
+      <div class="stats">
+        <h2>Statistiques personnelles : </h2>
+        <p> Liste des saisons gagnées : </p>
+        <ul>
+          <li>2015</li>
+          <li>2016</li>
+          <li>2017</li>
+        </ul>
+      </div>
+    </div>  
+     <div class="cover">
+      <h1>Listes des joueurs de cette équipe : </h1>
+      <table class="list list-horizontal list-highlight">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Numéro</th>
+            <th>Rôle</th>
+        </tr>
+    </thead>
+    <tbody>
+       {% for joueur in infoJoueur %}
+        <tr onclick="document.location='/joueur/{{joueur[0]}}'">
+            <td>{{joueur[1]}}</td>
+            <td>{{joueur[2]}}</td>
+            <td>{{joueur[4]}}</td>
+            <td> {{joueur[3]}} </td>
+        </tr>  
+        {% endfor %}
+    </tbody>
+</table>
+  </div>
+
+   <div class="cover">
+      <h1>Listes des parties de cette équipe : </h1>
+      <table class="list list-horizontal list-highlight">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Nom équipe : local</th>
+            <th>Score</th>
+            <th>Nom équipe : visiteur</th>
+        </tr>
+    </thead>
+    <tbody>
+       {% for partie in infoPartie %}
+        <tr onclick="document.location='/equipe/{{partie[4]}}/{{partie[5]}}'">
+            <td>{{partie[0]}}</td>
+            <td>{{partie[1]}}</td>
+            <td>score</td>
+            <td>{{partie[2]}}</td>
+        </tr>  
+        {% endfor %}
+    </tbody>
+</table>
+  </div>
+
+
+</div>
+
+</body>
+</html>

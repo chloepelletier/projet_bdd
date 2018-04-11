@@ -1,0 +1,112 @@
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Montserrat;
+  margin: 0;
+  background: url('img/fond.jpg') no-repeat fixed center center;
+  background-size: cover;
+  color: #0a0a0b;
+  overflow: hidden;
+}
+
+ul, nav{
+  list-style: none;
+  padding: 0;
+}
+
+a {
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+a:hover {
+  opacity: 1;
+}
+
+h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 1.5rem;
+  text-align: right;
+}
+
+i {
+  font-size: 1.3rem;
+}
+
+header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  padding: 10px 100px 0;
+}
+
+header nav ul {
+  display: flex;
+}
+
+header nav li{
+  margin: 0 15px;
+}
+
+header nav li:first-child{
+  margin-left: 0; 
+}
+
+header nav li:last-child{
+  margin-right: 0;  
+}
+
+.cover  {
+  width: 100%;
+  padding: 20px 50px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 70px;
+}
+
+
+.result {
+    border: solid 1px #DDEEEE;
+    border-collapse: collapse;
+    border-spacing: 0;
+    background-color:rgba(0, 0, 0, 0.6);
+    color: white;
+}
+.result thead th {
+    background-color: #336B6B;
+    border: solid 1px #336B6B;
+    color: white;
+    padding: 10px;
+    text-align: left;
+}
+.result tbody td {
+    border: solid 1px #DDEEEE;
+    padding: 10px;
+}
+.result-highlight tbody tr:hover {
+    background-color: #CCE7E7;
+    color: #336B6B;
+}
+
+.result-horizontal tbody td {
+    border-left: none;
+    border-right: none;
+}
+
+

@@ -1,0 +1,211 @@
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Montserrat;
+  margin: 0;
+  background: url('img/fond.jpg') no-repeat fixed center center;
+  background-size: cover;
+  color: #0a0a0b;
+}
+
+ul, nav{
+  list-style: none;
+  padding: 0;
+}
+
+a {
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+a:hover {
+  opacity: 1;
+}
+
+i {
+  font-size: 1.3rem;
+}
+
+header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  padding: 10px 100px 0;
+}
+
+header nav ul {
+  display: flex;
+}
+
+header nav li{
+  margin: 0 15px;
+}
+
+header nav li:first-child{
+  margin-left: 0; 
+}
+
+header nav li:last-child{
+  margin-right: 0;  
+}
+
+
+
+h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color:black;
+  margin: 0 0 1.5rem;
+  
+}
+h2{
+  font-size: 1.5rem;
+  font-weight: 700;
+  color:white;
+  margin: 0 0 1.5rem;
+}
+
+.joueur , .equipe, .partie {
+  background-color:rgba(170, 183, 184, 0.6);
+  width: 100%;
+  padding-left: 10px;
+  display: flex;
+  margin-top: 70px;
+ 
+}
+.info, td{
+ text-transform: uppercase; 
+}
+
+.joueur p , .equipe p, .partie p {
+  color : white;
+  font-weight: 600;
+  margin: 1px;
+}
+
+.perso, .stats, .general, .equipe1, .equipe2{
+  width: 500px;
+  margin: 20px;
+  padding: 3px;
+  background-color:rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+ul {
+  color: white;
+}
+
+.cover  {
+  width: 100%;
+  padding: 20px 50px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 70px;
+  background-color:rgba(170, 183, 184, 0.6);
+}
+
+
+.list {
+    border: solid 1px #DDEEEE;
+    border-collapse: collapse;
+    border-spacing: 0;
+    background-color:rgba(0, 0, 0, 0.6);
+    color: white;
+}
+.list thead th {
+    background-color: #336B6B;
+    border: solid 1px #336B6B;
+    color: white;
+    padding: 10px;
+    text-align: left;
+}
+.list tbody td {
+    border: solid 1px #DDEEEE;
+    padding: 2px;
+}
+.list-highlight tbody tr:hover {
+    background-color: #CCE7E7;
+    color: #336B6B;
+    cursor:pointer;
+}
+
+.list-horizontal tbody td {
+    border-left: none;
+    border-right: none;
+}
+
+
+button {
+    width: 200px;
+    height: 40px;
+    background: #336B6B;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    font-family: Montserrat;
+    cursor: pointer;
+    border: 1px solid #336B6B;
+}
+
+button:hover {
+     background: #DDEFEF;
+    color: #336B6B ;
+    border: 1px solid #DDEFEF;
+}
+
+.commentaires {
+  padding-left: 10px;
+  padding-right: 10px;
+  display: flex;
+  margin-bottom: 30px;
+  margin-top: 30px
+
+}
+
+.com {
+  width: 100%;
+    border: solid 1px #DDEEEE;
+    border-collapse: collapse;
+    border-spacing: 0;
+    background-color:rgba(0, 0, 0, 0.6);
+    color: white;
+}
+.com thead th {
+    background-color: #336B6B;
+    border: solid 1px #336B6B;
+    color: white;
+    padding: 10px;
+    text-align: left;
+}
+.com tbody td {
+    border: solid 1px #DDEEEE;
+    padding: 10px;
+}
+.com tbody tr:hover {
+    background-color: #CCE7E7;
+    color: #336B6B;
+}
+
+.com tbody td {
+    border-left: none;
+    border-right: none;
+}
+
+body{
+  margin-top: 150px;
+}
+
