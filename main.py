@@ -1,20 +1,90 @@
 from flask import Flask, render_template, request
-
+import pymysql 
+import pymysql.cursors 
 
 app = Flask(__name__) 
 
-
+#==============================
 
 
 @app.route("/") 
 def accueil(id=None): 
-    return render_template('accueil.html') 
+    conn= pymysql.connect( 
+        host='localhost', 
+        user='root', 
+        password='1994',
+        db='basketballer' )
+    cmd='SELECT nom_equipe FROM equipe;'
+    cur=conn.cursor()
+    cur.execute(cmd)
+    equipes = cur.fetchall()
+    return render_template('accueil.html', equipes=equipes) 
+
+#================================
+
+@app.route("/resultsearchjoueur", methods=['POST'])
+def resultsearchjoueur():
+   nom = request.form.get('nom')
+   prenom = request.form.get('prenom')
+   return getResult(nom,prenom)
 
 
+@app.route("/resultsearchjoueur")
+def getResult(nom,prenom):
+    conn= pymysql.connect( 
+        host='localhost', 
+        user='root', 
+        password='1994',
+        db='basketballer' )
+    if(nom and prenom): 
+        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl = '9999-12-31' AND joueur.nom_famille= '"+nom+"' AND joueur.prenom= '"+prenom+"';"
+        cur=conn.cursor()
+        cur.execute(cmd)
+        info = cur.fetchall()
+    elif(nom):
+        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl = '9999-12-31' AND joueur.nom_famille= '"+nom+"';"
+        cur=conn.cursor()
+        cur.execute(cmd)
+        info = cur.fetchall()
+    elif(prenom):
+        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl = '9999-12-31' AND joueur.prenom= '"+prenom+"';"
+        cur=conn.cursor()
+        cur.execute(cmd)
+        info = cur.fetchall()
+    return render_template('resultsearchjoueur.html',info=info)
+        
+
+#================================
+
+@app.route("/resultsearchpartie", methods=['POST'])
+def resultsearchpartie():
+   equipelocal = request.form.get('equipelocal')
+   equipevisiteur = request.form.get('equipevisiteur')
+   date = request.form.get('date')
+   return getResultPartie(equipelocal,equipevisiteur,date)
+
+
+@app.route("/resultsearchpartie")
+def getResultPartie(equipelocal,equipevisiteur,date):
+    conn= pymysql.connect( 
+        host='localhost', 
+        user='root', 
+        password='1994',
+        db='basketballer' )
+    if (date):
+        cmd="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND E1.nom_equipe= '"+equipelocal+"' AND E2.nom_equipe ='"+equipevisiteur+"' AND partie.date_partie='"+date+"';"
+        cur=conn.cursor()
+        cur.execute(cmd)
+        info = cur.fetchall()
+    else : 
+        cmd2="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND E1.nom_equipe= '"+equipelocal+"' AND E2.nom_equipe ='"+equipevisiteur+"';"
+        cur=conn.cursor()
+        cur.execute(cmd2)
+        info = cur.fetchall()
+    return render_template('resultsearchpartie.html',info=info)
         
 #====================
-import pymysql 
-import pymysql.cursors 
+
 
 @app.route("/joueur/<id>")
 def getJoueur(id=None):
@@ -56,6 +126,8 @@ def getJoueur(id=None):
     pourcentage_2pt = 0
     pourcentage_3pt = 0
     moy_min = 0
+    moy_rebond = 0
+    moy_faute = 0
 
     #nombre de match joués dans la saison. Enregistré dans variable nb_partie */
     cmd4="SELECT COUNT(*), SUM(P.minutes) FROM participe P WHERE P.id_joueur =" +id+ " AND P.annee=2018;"
@@ -117,11 +189,11 @@ def getJoueur(id=None):
         nb_point =  1*nb_panier_1pt + 2*nb_panier_2pt +3*nb_panier_3pt
         moy_point = nb_point / nb_partie
         if(nb_lancer_1pt) :
-            pourcentage_lancer_franc = nb_panier_1pt / nb_lancer_1pt #prob de division par zéro hahaha
+            pourcentage_lancer_franc = (nb_panier_1pt / nb_lancer_1pt) * 100 #prob de division par zéro hahaha
         if(nb_lancer_2pt) :
-            pourcentage_2pt = nb_panier_2pt / nb_lancer_2pt
+            pourcentage_2pt = (nb_panier_2pt / nb_lancer_2pt) * 100
         if (nb_lancer_3pt):
-            pourcentage_3pt = nb_panier_3pt / nb_lancer_3pt
+            pourcentage_3pt = (nb_panier_3pt / nb_lancer_3pt) * 100
 
     return render_template('joueur.html', prenom=info[1], nom=info[2],
                            naissance= info[3], taille=info[4], poids=info[5], 

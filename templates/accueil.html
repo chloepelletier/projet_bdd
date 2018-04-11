@@ -14,105 +14,40 @@
 
   <div class="cover">
     <h1>Quelles statistiques t'intéressent ?</h1>
-    <form  class="flex-form">
+
+    <form  class="flex-form" action="resultsearchjoueur" method="post">
       <label id="label">Joueur</label>
-      <input placeholder="Nom">
-      <input placeholder="Prénom">
+      <input placeholder="Nom" name="nom">
+      <input placeholder="Prénom" name="prenom">
       <button>Rechercher</button>
     </form>
-    <form  class="flex-form">
+
+    <form  class="flex-form" method="post">
       <label id="label">Equipe</label>
-      <select name="equipe" size="1">
-        <option>equipe1</option>
-        <option>equipe2</option>
+      <select name="equipeSearch" size="1">
+        {% for equipe in equipes %}
+        <option>{{equipe[0]}}</option>
+         {% endfor %}
       </select>  
       <button>Rechercher</button>
     </form>
-     <form  class="flex-form">
+
+     <form  class="flex-form" action="resultsearchpartie" method="post">
       <label id="label">Partie</label>
       <select name="equipelocal" size="1">
-        <option>equipe1</option>
-        <option>equipe2</option>
+        {% for equipe in equipes %}
+        <option>{{equipe[0]}}</option>
+         {% endfor %}
       </select>  
       <select name="equipevisiteur" size="1">
-        <option>equipe1</option>
-        <option>equipe2</option>
+        {% for equipe in equipes %}
+        <option>{{equipe[0]}}</option>
+         {% endfor %}
       </select>  
-      <input type="date">
+      <input type="date" name="date">
       <button>Rechercher</button>
     </form>
   </div>
-  <div class="cover">
-      <h1>Résultat(s) de la recherche de joueurs : </h1>
-      <table class="result result-horizontal result-highlight">
-    <thead>
-        <tr>
-            <th>Nom</th>
-            <th>Prénom</th>
-            <th>Nom Equipe</th>
-            <th>Lien</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>le nom du joueur</td>
-            <td>le prénom du joueur</td>
-            <td> le nom de son équipe</td>
-            <td>Allez à la fiche num id </td>
-        </tr>
-        <tr>
-            <td>le nom du joueur</td>
-            <td>le prénom du joueur</td>
-            <td> le nom de son équipe</td>
-            <td>Allez à la fiche num id </td>
-        </tr>
-        <tr>
-            <td>le nom du joueur</td>
-            <td>le prénom du joueur</td>
-            <td> le nom de son équipe</td>
-            <td>Allez à la fiche num id </td>
-        </tr>      
-    </tbody>
-</table>
-  </div>
-   <div class="cover">
-      <h1>Résultat(s) de la recherche de parties : </h1>
-      <table class="result result-horizontal result-highlight">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Nom de l'équipe : local</th>
-            <th>Nom de l'équipe : visiteur</th>
-            <th>Score</th>
-            <th>Lien vers la partie id</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>date de la partie</td>
-            <td>le nom de l'equipe locale</td>
-            <td>le nom de l'équipe visiteur</td>
-            <td> le score</td>
-            <td>Allez à la fiche num id </td>
-        </tr>
-         <tr>
-            <td>date de la partie</td>
-            <td>le nom de l'equipe locale</td>
-            <td>le nom de l'équipe visiteur</td>
-            <td> le score</td>
-            <td>Allez à la fiche num id </td>
-        </tr>
-         <tr>
-            <td>date de la partie</td>
-            <td>le nom de l'equipe locale</td>
-            <td>le nom de l'équipe visiteur</td>
-            <td> le score</td>
-            <td>Allez à la fiche num id </td>
-        </tr>   
-    </tbody>
-</table>
-  </div>
-
 </div>
 
 </body>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+  <link href='../static/resultsearch.css' rel='stylesheet' type='text/css'>
+  <title>Resultats</title>
+</head>
+<body>
+  <div class="container">
+  <header>
+    <h2><a href="/"> BasketStats</a></h2>
+    <nav>
+      <ul>
+        <li>
+          <a href="/" title="Recherche">Retour à la recherche </a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <div class="cover">
+      <h1>Résultat(s) de la recherche de parties : </h1>
+      <table class="result result-horizontal result-highlight">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Nom de l'équipe : local</th>
+            <th>Nom de l'équipe : visiteur</th>
+            <th>Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for partie in info %}
+        <tr  onclick="document.location='/partie/{{partie[0]}}/{{partie[1]}}'">
+            <td>{{partie[2]}}</td>
+            <td>{{partie[3]}}</td>
+            <td>{{partie[4]}}</td>
+            <td>score</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+</table>
+  </div>
+ 
+</div>
+
+</body>
+</html>
