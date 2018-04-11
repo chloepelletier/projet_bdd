@@ -60,7 +60,7 @@
     </thead>
     <tbody>
        {% for joueur in joueurs1 %}
-        <tr>
+        <tr onclick="document.location='/joueur/{{joueur[0]}}'">
             <td> {{joueur[1]}} </td>
             <td> {{joueur[2]}} </td>
             <td> {{joueur[3]}} </td>
@@ -103,7 +103,7 @@
     </thead>
     <tbody>
         {% for joueur in joueurs2 %}
-        <tr>
+        <tr onclick="document.location='/joueur/{{joueur[0]}}'">
             <td> {{joueur[1]}} </td>
             <td> {{joueur[2]}} </td>
             <td> {{joueur[3]}} </td>
