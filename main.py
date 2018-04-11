@@ -72,12 +72,12 @@ def getResultPartie(equipelocal,equipevisiteur,date):
         password='1994',
         db='basketballer' )
     if (date):
-        cmd="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND E1.nom_equipe= '"+equipelocal+"' AND E2.nom_equipe ='"+equipevisiteur+"' AND partie.date_partie='"+date+"';"
+        cmd="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND (E1.nom_equipe= '"+equipelocal+"'OR E2.nom_equipe= '"+equipelocal+"') AND (E2.nom_equipe ='"+equipevisiteur+"' OR E1.nom_equipe ='"+equipevisiteur+"') AND partie.date_partie='"+date+"';"
         cur=conn.cursor()
         cur.execute(cmd)
         info = cur.fetchall()
     else : 
-        cmd2="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND E1.nom_equipe= '"+equipelocal+"' AND E2.nom_equipe ='"+equipevisiteur+"';"
+        cmd2="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND (E1.nom_equipe= '"+equipelocal+"'OR E2.nom_equipe= '"+equipelocal+"') AND (E2.nom_equipe ='"+equipevisiteur+"' OR E1.nom_equipe ='"+equipevisiteur+"');"
         cur=conn.cursor()
         cur.execute(cmd2)
         info = cur.fetchall()
@@ -208,19 +208,28 @@ def getJoueur(id=None):
 
 
 #=========================
+@app.route("/equipe", methods=['POST'])
+def equipe():
+     equipe = request.form.get('equipeSearch')
+     return getEquipe(equipe)
 
-@app.route("/equipe/<id>")
-def getEquipe(id=None):
+
+@app.route("/equipe")
+def getEquipe(equipe):
     conn= pymysql.connect( 
         host='localhost', 
         user='root', 
         password='1994',
         db='basketballer' )
-    cmd='SELECT * FROM equipe WHERE num_equipe='+id+';'
+    cmd="SELECT num_equipe FROM equipe WHERE nom_equipe='"+equipe+"';"
+    cur=conn.cursor()
+    cur.execute(cmd)
+    id = cur.fetchone()[0]
+    cmd='SELECT * FROM equipe WHERE num_equipe='+str(id)+';'
     cur=conn.cursor()
     cur.execute(cmd)
     info = cur.fetchone()
-    cmd4="SELECT num_partie, annee FROM concoure WHERE num_equipe_loc="+id+" OR num_equipe_vis="+id+";"
+    cmd4="SELECT num_partie, annee FROM concoure WHERE num_equipe_loc="+str(id)+" OR num_equipe_vis="+str(id)+";"
     cur.execute(cmd4)
     info4 = cur.fetchall()
     id_partie=()
@@ -234,7 +243,7 @@ def getEquipe(id=None):
         infoPartie = cur.fetchall()
     else : 
         infoPartie = ("inconnu","inconnu","inconnu","inconnu","inconnu")
-    cmd2="SELECT id_joueur FROM contrat WHERE fin_excl='9999-12-31'AND num_equipe="+id+";"
+    cmd2="SELECT id_joueur FROM contrat WHERE fin_excl='9999-12-31'AND num_equipe="+str(id)+";"
     cur.execute(cmd2)
     info2 = cur.fetchall()
     id_joueur=()
