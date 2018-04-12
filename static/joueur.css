@@ -209,3 +209,6 @@ body{
   margin-top: 150px;
 }
 
+.cover table thead tr th, .cover table tbody tr td{
+  text-align: center
+}
