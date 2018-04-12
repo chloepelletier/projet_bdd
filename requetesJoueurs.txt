@@ -97,3 +97,45 @@ pourcentage_2pt = nb_paner_2pt / nb_lancer_2pt
 pourcentage_3pt = nb_paner_3pt / nb_lancer_3pt
 
 /*fin requêtes pour joueur */
+
+/*nb saisons gagnées par le joueur */
+
+
+/*trouvé le score d'une partie (ex:annee=2018, num_partie =1) */
+
+SELECT Ct.num_equipe, COUNT(IF(L.type_lancer = "1pt",1,NULL)) as paniers_1,
+	COUNT(IF(L.type_lancer = "2pt",1,NULL)) as paniers_2,
+    COUNT(IF(L.type_lancer = "3pt",1,NULL)) as paniers_3
+	FROM partie P,concoure Cc, contrat Ct, action A, lancer L
+	WHERE P.annee = 2018 AND P.num_partie =1
+		AND Cc.annee= P.annee AND Cc.num_partie = P.num_partie
+		AND L.annee=Cc.annee AND L.num_partie = Cc.num_partie AND L.est_panier = true
+		AND A.annee=L.annee AND A.num_partie = L.num_partie AND A.instant=L.instant
+		AND Ct.id_joueur = A.id_joueur 
+		AND Ct.debut_incl < P.date_partie AND P.date_partie < Ct.fin_excl
+ GROUP BY Ct.num_equipe;
+
+ /*trouver l'équipe gagnante d'une partie: */
+CREATE TEMPORARY TABLE score_temp1(
+SELECT Ct.num_equipe, 1*COUNT(IF(L.type_lancer = "1pt",1,NULL)) + 2*COUNT(IF(L.type_lancer = "2pt",1,NULL)) +
+    3*COUNT(IF(L.type_lancer = "3pt",1,NULL)) as score
+	FROM partie P,concoure Cc, contrat Ct, action A, lancer L
+	WHERE P.annee = 2018 AND P.num_partie =1
+		AND Cc.annee= P.annee AND Cc.num_partie = P.num_partie
+		AND L.annee=Cc.annee AND L.num_partie = Cc.num_partie AND L.est_panier = true
+		AND A.annee=L.annee AND A.num_partie = L.num_partie AND A.instant=L.instant
+		AND Ct.id_joueur = A.id_joueur 
+		AND Ct.debut_incl < P.date_partie AND P.date_partie < Ct.fin_excl
+ GROUP BY Ct.num_equipe
+ );
+CREATE TEMPORARY TABLE score_temp2 AS
+SELECT *
+FROM score_temp1;
+/* équipe gagnante: */
+ SELECT num_equipe, score
+ FROM score_temp1
+ WHERE score = (SELECT MAX(score)
+				FROM score_temp2);
+                
+DROP TEMPORARY TABLE score_temp1;
+DROP TEMPORARY TABLE score_temp2;

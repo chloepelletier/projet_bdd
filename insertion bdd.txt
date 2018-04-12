@@ -58,14 +58,12 @@ VALUES (2018, 3, 'brooklyn', '2018-03-22'),
 
 INSERT INTO partie (annee, num_partie, ville, date_partie) 
 VALUES   (2017, 1, 'new-york', '2017-03-02'),
-	 (2016, 1, 'new-york', '2016-04-02');
+		 (2016, 1, 'new-york', '2016-04-02');
 
 INSERT INTO serie (annee, num_serie)
-VALUES (2018,1);
-
-INSERT INTO serie (annee, num_serie)
-VALUES  (2018,2),
-	(2017,1);
+VALUES  (2018,1),
+		(2018,2),
+		(2017,1);
 
 INSERT INTO appartient(annee, num_partie, num_serie, num_sous_serie)
 VALUES (2018,1, 1, 2);
@@ -86,7 +84,7 @@ VALUES	(2018, 3, 1, 3),
 	(2018, 7, 1, 7);
 
 INSERT INTO appartient (annee, num_partie,  num_serie, num_sous_serie) 
-VALUES	(2018, 8, 1, 0); /* DOIT ÉCHOUER, depasse 7 parties */
+VALUES	(2018, 8, 1, 0); /* DOIT ÉCHOUER, depasse 7 parties (numéro 0 interdit)*/
 
 INSERT INTO appartient(annee, num_partie, num_serie, num_sous_serie)
 VALUES (2017,1, 1, 1);
@@ -210,6 +208,7 @@ VALUES (2018,1,'00:25:32','defensif');
 
 UPDATE appartient SET annee=2018 WHERE annee=2017 AND num_partie = 1;
 /*Doit échouer, on aurait plus de 7 parties*/
+/*Pu vraiment relevant */
 
 
 /* Pour vérifier le gagnant d'une partie */
