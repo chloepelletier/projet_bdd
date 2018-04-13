@@ -60,19 +60,24 @@ def getResult(nom,prenom):
 def resultsearchpartie():
    equipelocal = request.form.get('equipelocal')
    equipevisiteur = request.form.get('equipevisiteur')
-   date = request.form.get('date')
-   return getResultPartie(equipelocal,equipevisiteur,date)
+   dateDebut = request.form.get('dateDebut')
+   dateFin = request.form.get('dateFin')
+   return getResultPartie(equipelocal,equipevisiteur,dateDebut,dateFin)
 
 
 @app.route("/resultsearchpartie")
-def getResultPartie(equipelocal,equipevisiteur,date):
+def getResultPartie(equipelocal,equipevisiteur,dateDebut, dateFin):
     conn= pymysql.connect( 
         host='localhost', 
         user='root', 
         password='1994',
         db='basketballer' )
-    if (date):
-        cmd="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND (E1.nom_equipe= '"+equipelocal+"'OR E2.nom_equipe= '"+equipelocal+"') AND (E2.nom_equipe ='"+equipevisiteur+"' OR E1.nom_equipe ='"+equipevisiteur+"') AND partie.date_partie='"+date+"';"
+    if (dateDebut or dateFin):
+        if not(dateDebut): 
+            dateDebut='0000-00-00'
+        if not(dateFin): 
+            dateFin='9999-12-31'
+        cmd="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND (E1.nom_equipe= '"+equipelocal+"'OR E2.nom_equipe= '"+equipelocal+"') AND (E2.nom_equipe ='"+equipevisiteur+"' OR E1.nom_equipe ='"+equipevisiteur+"') AND partie.date_partie BETWEEN '" +dateDebut+"' AND '"+ dateFin+"';"
         cur=conn.cursor()
         cur.execute(cmd)
         info = cur.fetchall()
