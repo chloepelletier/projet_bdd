@@ -125,6 +125,7 @@ ul {
     border-spacing: 0;
     background-color:rgba(0, 0, 0, 0.6);
     color: white;
+    font-size: 15px;
 }
 .list thead th {
     background-color: #336B6B;
@@ -167,43 +168,7 @@ button:hover {
     border: 1px solid #DDEFEF;
 }
 
-.commentaires {
-  padding-left: 10px;
-  padding-right: 10px;
-  display: flex;
-  margin-bottom: 30px;
-  margin-top: 30px
 
-}
-
-.com {
-  width: 100%;
-    border: solid 1px #DDEEEE;
-    border-collapse: collapse;
-    border-spacing: 0;
-    background-color:rgba(0, 0, 0, 0.6);
-    color: white;
-}
-.com thead th {
-    background-color: #336B6B;
-    border: solid 1px #336B6B;
-    color: white;
-    padding: 10px;
-    text-align: left;
-}
-.com tbody td {
-    border: solid 1px #DDEEEE;
-    padding: 10px;
-}
-.com tbody tr:hover {
-    background-color: #CCE7E7;
-    color: #336B6B;
-}
-
-.com tbody td {
-    border-left: none;
-    border-right: none;
-}
 
 body{
   margin-top: 150px;

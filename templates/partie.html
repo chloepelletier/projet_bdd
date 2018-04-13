@@ -38,7 +38,7 @@
     </div> 
     
    <div class="cover">
-      <h1>{{equipes[0]}} : liste des joueurs </h1>
+      <h1><span class="info">{{equipes[0]}}</span> : liste des joueurs </h1>
       <table class="list list-horizontal list-highlight">
     <thead>
         <tr>
@@ -66,22 +66,22 @@
             <td> {{joueur[3]}} </td>
             <td> {{joueur[4]}} </td>
             <td> {{joueur[5]}} min </td>
-            <td> Points marqué </td>
-            <td> Lancer franc </td>
-            <td> Panier à 2pts </td>
-            <td> Panier à 3 pts </td>
-            <td> Fautes </td>
-            <td> Rebond </td>
-            <td> Revirement </td>
-            <td> Vol de balle </td>
-            <td> Assistance </td>
+            <td> {{joueur[10]+2*joueur[11]+3*joueur[12]}} </td>
+            <td> {{joueur[10]}}</td>
+            <td> {{joueur[11]}} </td>
+            <td> {{joueur[12]}} </td>
+            <td> {{joueur[6]}}</td>
+            <td> {{joueur[7]}}</td>
+            <td> {{joueur[8]}} </td>
+            <td> {{joueur[13]}} </td>
+            <td> {{joueur[9]}} </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
   </div>
   <div class="cover">
-      <h1>{{equipes[1]}} : liste des joueurs </h1>
+      <h1><span class="info">{{equipes[1]}}</span> : liste des joueurs </h1>
       <table class="list list-horizontal list-highlight">
     <thead>
         <tr>
@@ -104,20 +104,20 @@
     <tbody>
         {% for joueur in joueurs2 %}
         <tr onclick="document.location='/joueur/{{joueur[0]}}'">
-            <td> {{joueur[1]}} </td>
+             <td> {{joueur[1]}} </td>
             <td> {{joueur[2]}} </td>
             <td> {{joueur[3]}} </td>
             <td> {{joueur[4]}} </td>
             <td> {{joueur[5]}} min </td>
-            <td> Points marqué </td>
-            <td> Lancer franc </td>
-            <td> Panier à 2pts </td>
-            <td> Panier à 3 pts </td>
-            <td> Fautes </td>
-            <td> Rebond </td>
-            <td> Revirement </td>
-            <td> Vol de balle </td>
-            <td> Assistance </td>
+            <td> {{joueur[10]+2*joueur[11]+3*joueur[12]}} </td>
+            <td> {{joueur[10]}}</td>
+            <td> {{joueur[11]}} </td>
+            <td> {{joueur[12]}} </td>
+            <td> {{joueur[6]}}</td>
+            <td> {{joueur[7]}}</td>
+            <td> {{joueur[8]}} </td>
+            <td> {{joueur[13]}} </td>
+            <td> {{joueur[9]}} </td>
         </tr>
         {% endfor %}
     </tbody>
