@@ -1,3 +1,5 @@
+use basketballer;
+
 DELETE FROM equipe;
 DELETE FROM joueur;
 DELETE FROM partie;
@@ -7,6 +9,8 @@ DELETE FROM contrat;
 DELETE FROM concoure;
 DELETE FROM participe;
 DELETE FROM action;
+
+DELETE FROM lancer;
 
 
 
@@ -194,7 +198,6 @@ VALUES (2018,1,'00:10:30','offensif');
 
 INSERT INTO action (annee, num_partie, instant, type_action, id_joueur)
 VALUES (2018,1,'00:11:45','faute',3);
-
 INSERT INTO faute (annee, num_partie, instant, type_faute)
 VALUES (2018,1,'00:11:45','defensif');
 

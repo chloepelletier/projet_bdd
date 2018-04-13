@@ -83,14 +83,15 @@ CREATE TABLE concoure(annee int, num_partie int, num_equipe_loc int NOT NULL, nu
 	
 delimiter //
 CREATE TRIGGER points_null
-BEFORE INSERT ON contrat
+BEFORE INSERT ON concoure
 FOR EACH ROW
 BEGIN
 	IF (NEW.points_loc IS null)
 	THEN SET NEW.points_loc = 0;
 	END IF;
 	IF (NEW.points_vis IS null)
-	THEN SET NEW.points_loc = 0;
+	THEN SET NEW.points_vis = 0;
+	END IF;
 END;//
 delimiter ;
 
@@ -237,7 +238,7 @@ BEGIN
 	END IF;
 END;//
 delimiter ;
-
+   
 delimiter //
 CREATE TRIGGER update_points_au_panier
 BEFORE INSERT ON lancer
@@ -245,9 +246,13 @@ FOR EACH ROW
 BEGIN
 IF (NEW.est_panier)
 THEN
-	SET @points = (1*COUNT(IF(NEW.type_lancer = "1pt",1,NULL)) +
+	/*
+    SET @points = (SELECT COUNT(IF(NEW.type_lancer = "1pt",1,NULL)));
+    
+    */
+    SET @points = (SELECT( 1*COUNT(IF(NEW.type_lancer = "1pt",1,NULL)) +
 			2*COUNT(IF(NEW.type_lancer = "2pt",1,NULL)) +
-			3*COUNT(IF(NEW.type_lancer = "3pt",1,NULL)));
+			3*COUNT(IF(NEW.type_lancer = "3pt",1,NULL))));
 
 	SET @equipe_local =
 	(SELECT COUNT(*)
@@ -255,23 +260,23 @@ THEN
 		 WHERE P.annee = NEW.annee AND P.num_partie = NEW.num_partie
 		  AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
 		  AND A.annee=NEW.annee AND A.num_partie=NEW.num_partie AND A.instant=NEW.instant
-		  AND (Ct.num_equipe = Cc.num_equipe_loc AND Ct.id_joueur = A.id_joueur
+		  AND Ct.num_equipe = Cc.num_equipe_loc AND Ct.id_joueur = A.id_joueur
 		  AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl );
 		  
-	IF(@equipe_local)
+	IF(@equipe_local > 0)
 	THEN 
 		UPDATE concoure
 		SET points_loc = points_loc + @points
 		WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
-	ELSE THEN
-		(UPDATE concoure
+	ELSE
+		UPDATE concoure
 		SET points_vis = points_vis + @points
-		WHERE annee=NEW.annee AND num_partie=NEW.num_partie);
+		WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
 	END IF;
+    
 END IF;
 END;//
 delimiter ;
-/* fonctionne pas */
 
 CREATE TABLE assiste(id_joueur int NOT NULL, annee int, num_partie int, instant time,
 	PRIMARY KEY(annee, num_partie, instant),
