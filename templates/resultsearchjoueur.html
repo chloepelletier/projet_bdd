@@ -4,42 +4,43 @@
   <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
   <link href='../static/resultsearch.css' rel='stylesheet' type='text/css'>
   <title>Resultats</title>
+  
 </head>
 <body>
   <div class="container">
-  <header>
-    <h2><a href="/"> BasketStats</a></h2>
-    <nav>
-      <ul>
-        <li>
-          <a href="/" title="Recherche">Retour à la recherche </a>
-        </li>
-      </ul>
-    </nav>
-  </header>
-  <div class="cover">
+    <header>
+      <h2><a href="/"> BasketStats</a></h2>
+      <nav>
+        <ul>
+          <li>
+            <a href="/" title="Recherche">Retour à la recherche </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <!-- bloc de résultats de la recherche -->
+    <div class="cover">
       <h1>Résultat(s) de la recherche de joueurs : </h1>
       <table class="result result-horizontal result-highlight">
-    <thead>
-        <tr>
+        <thead>
+          <tr>
             <th>Nom</th>
             <th>Prénom</th>
             <th>Nom d'équipe</th>
-        </tr>
-    </thead>
-    <tbody>
-      {% for joueur in info %}
-        <tr  onclick="document.location='/joueur/{{joueur[0]}}'">
+          </tr>
+        </thead>
+        <tbody>
+          {% for joueur in info %}
+          <tr  onclick="document.location='/joueur/{{joueur[0]}}'">
             <td>{{joueur[1]}}</td>
             <td>{{joueur[2]}}</td>
             <td>{{joueur[3]}}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-</table>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    
   </div>
- 
-</div>
-
 </body>
 </html>
