@@ -184,3 +184,21 @@ body{
 .cover table thead tr th, .cover table tbody tr td{
   text-align: center
 }
+
+rect {
+  fill: none; 
+}
+
+text {
+  font-size: 15px;
+   font-family: Montserrat;
+}
+
+#donutchart, #donutchart2 {
+  width: 50%; 
+  height: 500px;
+}
+.diagramme{
+  display: flex;
+
+}
