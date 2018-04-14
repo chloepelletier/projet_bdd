@@ -156,9 +156,23 @@ ul {
     border-right: none;
 }
 
-
+label {
+  color: white;
+}
+select {
+  width:100px;
+  box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.3);
+  border: 0; */
+  padding-right: 10px;
+  padding-left: 10px;
+  background: #fff; 
+  height: 40px; 
+  font-size: 1rem; 
+  border-radius: 0; 
+  margin-bottom: 20px;
+}
 button {
-    width: 200px;
+    width: 100px;
     height: 40px;
     background: #336B6B;
     color: white;

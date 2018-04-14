@@ -7,7 +7,7 @@ from random import randint
 
 conn= pymysql.connect(host='localhost',
                         user='root',
-                        password='12345',
+                        password='1994',
                         db='basketballer' )
 cur=conn.cursor()
 
