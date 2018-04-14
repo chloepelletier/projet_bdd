@@ -117,21 +117,21 @@ while annee<2019:
             inv = 1
             partie = "INSERT INTO partie (annee, num_partie, ville, date_partie) VALUES ("'"{0}"'", "'"{1}"'", "'"{2}"'","'"{3}"'");".format(annee, k, town[loc], datetime.date(annee, mois, jour))
             cur.execute(partie)
-            sousSerie = "INSERT INTO appartient(annee, num_partie, num_serie, num_sous_serie) VALUES ("'"{0}"'", "'"{1}"'", "'"{2}"'", "'"{3}"'");".format(annee, k, 0, k-148)
+            sousSerie = "INSERT INTO appartient(annee, num_partie, num_serie, num_sous_serie) VALUES ("'"{0}"'", "'"{1}"'", "'"{2}"'", "'"{3}"'");".format(annee, k, 0, k-147)
             cur.execute(sousSerie)
         elif 152<=k<156:
             loc = 9
             inv = 26
             partie = "INSERT INTO partie (annee, num_partie, ville, date_partie) VALUES ("'"{0}"'", "'"{1}"'", "'"{2}"'","'"{3}"'");".format(annee, k, town[loc], datetime.date(annee, mois, jour))
             cur.execute(partie)
-            sousSerie = "INSERT INTO appartient(annee, num_partie, num_serie, num_sous_serie) VALUES ("'"{0}"'", "'"{1}"'", "'"{2}"'", "'"{3}"'");".format(annee, k, 1, k-152)
+            sousSerie = "INSERT INTO appartient(annee, num_partie, num_serie, num_sous_serie) VALUES ("'"{0}"'", "'"{1}"'", "'"{2}"'", "'"{3}"'");".format(annee, k, 1, k-151)
             cur.execute(sousSerie)
         else:
             loc = 26
             inv = 5
             partie = "INSERT INTO partie (annee, num_partie, ville, date_partie) VALUES ("'"{0}"'", "'"{1}"'", "'"{2}"'","'"{3}"'");".format(annee, k, town[loc], datetime.date(annee, mois, jour))
             cur.execute(partie)
-            sousSerie = "INSERT INTO appartient(annee, num_partie, num_serie, num_sous_serie) VALUES ("'"{0}"'", "'"{1}"'", "'"{2}"'", "'"{3}"'");".format(annee, k, 2, k-156)
+            sousSerie = "INSERT INTO appartient(annee, num_partie, num_serie, num_sous_serie) VALUES ("'"{0}"'", "'"{1}"'", "'"{2}"'", "'"{3}"'");".format(annee, k, 2, k-155)
             cur.execute(sousSerie)
         
         
