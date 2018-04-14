@@ -54,6 +54,11 @@ def getResult(nom,prenom):
         cur=conn.cursor()
         cur.execute(cmd)
         info = cur.fetchall()
+    else : 
+        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl = '9999-12-31';"
+        cur=conn.cursor()
+        cur.execute(cmd)
+        info = cur.fetchall()
     return render_template('resultsearchjoueur.html',info=info)
         
 
