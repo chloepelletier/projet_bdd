@@ -4,6 +4,9 @@ import pymysql.cursors
 
 app = Flask(__name__) 
 
+#=======IDENTIFIANT DE CONNEXION A LA BASE DE DONNEES ============
+userid = 'root'
+userpassword = '1994'
 #==============================
 
 
@@ -11,8 +14,8 @@ app = Flask(__name__)
 def accueil(id=None): 
     conn= pymysql.connect( 
         host='localhost', 
-        user='root', 
-        password='1994',
+        user=userid, 
+        password=userpassword,
         db='basketballer' )
     cmd='SELECT nom_equipe FROM equipe;'
     cur=conn.cursor()
@@ -33,8 +36,8 @@ def resultsearchjoueur():
 def getResult(nom,prenom):
     conn= pymysql.connect( 
         host='localhost', 
-        user='root', 
-        password='1994',
+        user=userid, 
+        password=userpassword,
         db='basketballer' )
     if(nom and prenom): 
         cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl = '9999-12-31' AND joueur.nom_famille= '"+nom+"' AND joueur.prenom= '"+prenom+"';"
@@ -69,8 +72,8 @@ def resultsearchpartie():
 def getResultPartie(equipelocal,equipevisiteur,dateDebut, dateFin):
     conn= pymysql.connect( 
         host='localhost', 
-        user='root', 
-        password='1994',
+        user=userid, 
+        password=userpassword,
         db='basketballer' )
     if (dateDebut or dateFin):
         if not(dateDebut): 
@@ -95,8 +98,8 @@ def getResultPartie(equipelocal,equipevisiteur,dateDebut, dateFin):
 def getJoueur(id=None):
     conn= pymysql.connect( 
         host='localhost', 
-        user='root', 
-        password='1994',
+        user=userid, 
+        password=userpassword,
         db='basketballer' )
     cmd='SELECT * FROM joueur WHERE id_joueur='+id+';'
     cur=conn.cursor()
@@ -223,8 +226,8 @@ def equipe():
 def getEquipe(equipe):
     conn= pymysql.connect( 
         host='localhost', 
-        user='root', 
-        password='1994',
+        user=userid, 
+        password=userpassword,
         db='basketballer' )
     cmd="SELECT num_equipe FROM equipe WHERE nom_equipe='"+equipe+"';"
     cur=conn.cursor()
@@ -274,8 +277,8 @@ def getEquipe(equipe):
 def getPartie(annee=None,num=None):
     conn= pymysql.connect( 
         host='localhost', 
-        user='root', 
-        password='1994',
+        user=userid, 
+        password=userpassword,
         db='basketballer' )
     #recuperation des infos generales
     cmd='SELECT * FROM partie WHERE num_partie ='+num+' AND annee='+annee+';'
