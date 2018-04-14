@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request
+from datetime import date
+
 import pymysql 
 import pymysql.cursors 
 
@@ -34,28 +36,30 @@ def resultsearchjoueur():
 
 @app.route("/resultsearchjoueur")
 def getResult(nom,prenom):
+    today = date.today()
+    ajd = ""+str(today.year)+"-"+str(today.month)+"-"+str(today.day)+""
     conn= pymysql.connect( 
         host='localhost', 
         user=userid, 
         password=userpassword,
         db='basketballer' )
     if(nom and prenom): 
-        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl = '9999-12-31' AND joueur.nom_famille= '"+nom+"' AND joueur.prenom= '"+prenom+"';"
+        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl >= '"+ ajd +"' AND joueur.nom_famille= '"+nom+"' AND joueur.prenom= '"+prenom+"';"
         cur=conn.cursor()
         cur.execute(cmd)
         info = cur.fetchall()
     elif(nom):
-        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl = '9999-12-31' AND joueur.nom_famille= '"+nom+"';"
+        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl >= '"+ ajd +"' AND joueur.nom_famille= '"+nom+"';"
         cur=conn.cursor()
         cur.execute(cmd)
         info = cur.fetchall()
     elif(prenom):
-        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl = '9999-12-31' AND joueur.prenom= '"+prenom+"';"
+        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl >= '"+ ajd +"' AND joueur.prenom= '"+prenom+"';"
         cur=conn.cursor()
         cur.execute(cmd)
         info = cur.fetchall()
     else : 
-        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl = '9999-12-31';"
+        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl >= '"+ ajd +"';"
         cur=conn.cursor()
         cur.execute(cmd)
         info = cur.fetchall()
@@ -101,6 +105,8 @@ def getResultPartie(equipelocal,equipevisiteur,dateDebut, dateFin):
 
 @app.route("/joueur/<id>")
 def getJoueur(id=None):
+    today = date.today()
+    ajd = ""+str(today.year)+"-"+str(today.month)+"-"+str(today.day)+""
     conn= pymysql.connect( 
         host='localhost', 
         user=userid, 
@@ -110,7 +116,7 @@ def getJoueur(id=None):
     cur=conn.cursor()
     cur.execute(cmd)
     info = cur.fetchone()
-    cmd2="SELECT * FROM contrat WHERE fin_excl='9999-12-31'AND id_joueur="+id+";"
+    cmd2="SELECT * FROM contrat WHERE fin_excl>='"+ajd+"1'AND id_joueur="+id+";"
     cur.execute(cmd2)
     info2 = cur.fetchone()
     if (info2) :
@@ -149,11 +155,11 @@ def getJoueur(id=None):
     nb_partie = infoParticipe[0]
     nb_minute = infoParticipe[1] #
     if(nb_partie) :
-        moy_min = nb_minute / nb_partie
+        moy_min = round(nb_minute / nb_partie,2)
         #Moyenne des assists  par partie
         cmd5='SELECT COUNT(*) FROM  assiste A WHERE A.annee=2018 AND A.id_joueur='+id+';'
         cur.execute(cmd5)
-        nb_assiste = cur.fetchone()[0]
+        nb_assiste = round(cur.fetchone()[0],2)
         #action
         cmd6 = 'SELECT * FROM  action A WHERE A.annee=2018 AND A.id_joueur='+id+';'
         cur.execute(cmd6)
@@ -166,8 +172,8 @@ def getJoueur(id=None):
                 nb_rebond +=1
             if Tuple[3] == "faute" :
                 nb_faute +=1
-        moy_rebond = nb_rebond / nb_partie
-        moy_faute = nb_faute / nb_partie
+        moy_rebond = round(nb_rebond / nb_partie,2)
+        moy_faute = round(nb_faute / nb_partie,2)
         #lancers e trevirements:
         for Tuple in action :
             if Tuple[3] == "lancer" :
@@ -196,17 +202,17 @@ def getJoueur(id=None):
                 elif revirement[0] == "defensif":
                     nb_revirement_n +=1
 
-        moy_assiste = nb_assiste / nb_partie
-        moy_vol_balle = nb_revirement_p / nb_partie
-        moy_revirement = nb_revirement_n / nb_partie
+        moy_assiste = round(nb_assiste / nb_partie,2)
+        moy_vol_balle = round(nb_revirement_p / nb_partie,2)
+        moy_revirement = round(nb_revirement_n / nb_partie,2)
         nb_point =  1*nb_panier_1pt + 2*nb_panier_2pt +3*nb_panier_3pt
-        moy_point = nb_point / nb_partie
+        moy_point = round(nb_point / nb_partie,2)
         if(nb_lancer_1pt) :
-            pourcentage_lancer_franc = (nb_panier_1pt / nb_lancer_1pt) * 100 #prob de division par zéro hahaha
+            pourcentage_lancer_franc = round((nb_panier_1pt / nb_lancer_1pt) * 100,2) #prob de division par zéro hahaha
         if(nb_lancer_2pt) :
-            pourcentage_2pt = (nb_panier_2pt / nb_lancer_2pt) * 100
+            pourcentage_2pt = round((nb_panier_2pt / nb_lancer_2pt) * 100,2)
         if (nb_lancer_3pt):
-            pourcentage_3pt = (nb_panier_3pt / nb_lancer_3pt) * 100
+            pourcentage_3pt = round((nb_panier_3pt / nb_lancer_3pt) * 100,2)
 
     return render_template('joueur.html', prenom=info[1], nom=info[2],
                            naissance= info[3], taille=info[4], poids=info[5], 
@@ -229,6 +235,8 @@ def equipe():
 
 @app.route("/equipe")
 def getEquipe(equipe):
+    today = date.today()
+    ajd = ""+str(today.year)+"-"+str(today.month)+"-"+str(today.day)+""
     conn= pymysql.connect( 
         host='localhost', 
         user=userid, 
@@ -256,7 +264,7 @@ def getEquipe(equipe):
         infoPartie = cur.fetchall()
     else : 
         infoPartie = ("inconnu","inconnu","inconnu","inconnu","inconnu")
-    cmd2="SELECT id_joueur FROM contrat WHERE fin_excl='9999-12-31'AND num_equipe="+str(id)+";"
+    cmd2="SELECT id_joueur FROM contrat WHERE fin_excl>='"+ajd+"'AND num_equipe="+str(id)+";"
     cur.execute(cmd2)
     info2 = cur.fetchall()
     id_joueur=()
