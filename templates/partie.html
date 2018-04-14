@@ -31,12 +31,12 @@
      <div class="equipe1">
       <h2> Equipe locale </h2>
       <h2> <span class="info">{{equipes[0]}} </span></h2>
-      <h2> {{score_local}}Pts</h2>
+      <h2> {{scores[0]}} Pts</h2>
     </div>
     <div class="equipe2">
       <h2> Equipe adverse </h2>
       <h2><span class="info">{{equipes[1]}}</span> </h2>
-      <h2> {{score_vis}} Pts </h2>
+      <h2> {{scores[1]}} Pts </h2>
     </div>
   </div> 
   <!-- bloc d'informations sur l'équipe locale jouant la partie -->
@@ -187,7 +187,7 @@
   else if (`{{action[2]}}`== `{{equipes[1]}}`){
     nbequipeA +=1
   }
-  
+
   {% endfor %}
   google.charts.load("current", {packages:["corechart"]});
   google.charts.setOnLoadCallback(drawChart);

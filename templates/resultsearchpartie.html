@@ -25,8 +25,8 @@
         <tr>
             <th>Date</th>
             <th>Nom de l'équipe : local</th>
-            <th>Nom de l'équipe : visiteur</th>
             <th>Score</th>
+            <th>Nom de l'équipe : visiteur</th>
         </tr>
     </thead>
     <tbody>
@@ -34,8 +34,8 @@
         <tr  onclick="document.location='/partie/{{partie[0]}}/{{partie[1]}}'">
             <td>{{partie[2]}}</td>
             <td>{{partie[3]}}</td>
+            <td>{{partie[5]}} - {{partie[6]}}</td>
             <td>{{partie[4]}}</td>
-            <td>score</td>
         </tr>
       {% endfor %}
     </tbody>

@@ -80,12 +80,12 @@ def getResultPartie(equipelocal,equipevisiteur,dateDebut, dateFin):
             dateDebut='0000-00-00'
         if not(dateFin): 
             dateFin='9999-12-31'
-        cmd="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND (E1.nom_equipe= '"+equipelocal+"'OR E2.nom_equipe= '"+equipelocal+"') AND (E2.nom_equipe ='"+equipevisiteur+"' OR E1.nom_equipe ='"+equipevisiteur+"') AND partie.date_partie BETWEEN '" +dateDebut+"' AND '"+ dateFin+"';"
+        cmd="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe, concoure.points_loc, concoure.points_vis from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND (E1.nom_equipe= '"+equipelocal+"'OR E2.nom_equipe= '"+equipelocal+"') AND (E2.nom_equipe ='"+equipevisiteur+"' OR E1.nom_equipe ='"+equipevisiteur+"') AND partie.date_partie BETWEEN '" +dateDebut+"' AND '"+ dateFin+"';"
         cur=conn.cursor()
         cur.execute(cmd)
         info = cur.fetchall()
     else : 
-        cmd2="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND (E1.nom_equipe= '"+equipelocal+"'OR E2.nom_equipe= '"+equipelocal+"') AND (E2.nom_equipe ='"+equipevisiteur+"' OR E1.nom_equipe ='"+equipevisiteur+"');"
+        cmd2="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe, concoure.points_loc, concoure.points_vis from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND (E1.nom_equipe= '"+equipelocal+"'OR E2.nom_equipe= '"+equipelocal+"') AND (E2.nom_equipe ='"+equipevisiteur+"' OR E1.nom_equipe ='"+equipevisiteur+"');"
         cur=conn.cursor()
         cur.execute(cmd2)
         info = cur.fetchall()
@@ -246,7 +246,7 @@ def getEquipe(equipe):
     if(len(id_partie)==1) : 
         id_partie="("+ str(id_partie[0])+")"
     if (id_partie) :
-        cmd5="SELECT partie.date_partie, E1.nom_equipe, E2.nom_equipe, partie.annee,partie.num_partie FROM partie,concoure, equipe E1, equipe E2 WHERE partie.num_partie=concoure.num_partie AND partie.annee=concoure.annee AND E1.num_equipe = concoure.num_equipe_loc AND E2.num_equipe = concoure.num_equipe_vis AND (partie.num_partie,partie.annee) IN "+str(id_partie)+";"
+        cmd5="SELECT partie.date_partie, E1.nom_equipe, E2.nom_equipe, partie.annee,partie.num_partie, concoure.points_loc, concoure.points_vis FROM partie,concoure, equipe E1, equipe E2 WHERE partie.num_partie=concoure.num_partie AND partie.annee=concoure.annee AND E1.num_equipe = concoure.num_equipe_loc AND E2.num_equipe = concoure.num_equipe_vis AND (partie.num_partie,partie.annee) IN "+str(id_partie)+";"
         cur.execute(cmd5)
         infoPartie = cur.fetchall()
     else : 
@@ -289,6 +289,10 @@ def getPartie(annee=None,num=None):
     cmd2='SELECT E1.nom_equipe, E2.nom_equipe FROM concoure,equipe E1, equipe E2 WHERE E1.num_equipe = concoure.num_equipe_loc AND E2.num_equipe = concoure.num_equipe_vis AND num_partie ='+num+' AND annee='+annee+';'
     cur.execute(cmd2)
     equipes = cur.fetchone()
+    # recuperation des points 
+    cmd6='SELECT C.points_loc, C.points_vis FROM concoure C WHERE num_partie ='+num+' AND annee='+annee+';'
+    cur.execute(cmd6)
+    scores = cur.fetchone()
     #liste joueur equipe 1 
     cmd3="SELECT J.id_joueur, Ct.dossard,J.nom_famille, J.prenom, J.role, PA.minutes,"\
     "COUNT(IF(A.type_action='faute'  AND A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur=J.id_joueur,1,NULL)) AS nb_faute,"\
@@ -357,7 +361,7 @@ def getPartie(annee=None,num=None):
     cmd5="SELECT action.instant, action.type_action, equipe.nom_equipe, joueur.nom_famille, joueur.prenom FROM action, equipe, contrat, joueur WHERE action.id_joueur = contrat.id_joueur AND contrat.num_equipe = equipe.num_equipe AND joueur.id_joueur = action.id_joueur AND action.num_partie ="+num+" AND action.annee="+annee+";"
     cur.execute(cmd5)
     actions = cur.fetchall()
-    return render_template('partie.html', info=info,equipes= equipes, joueurs1=joueurs1, joueurs2=joueurs2, actions = actions)
+    return render_template('partie.html', info=info,equipes=equipes, scores=scores ,joueurs1=joueurs1, joueurs2=joueurs2, actions = actions)
   
         
 
