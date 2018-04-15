@@ -21,11 +21,12 @@
         <button>Rechercher</button>
       </form>
       <!-- formulaire pour la recherche d'équipes -->
+
       <form  class="flex-form" action="equipe" method="post">
         <label id="label">Equipe</label>
         <select name="equipeSearch" size="1">
           {% for equipe in equipes %}
-          <option>{{equipe[0]}}</option>
+          <option value={{equipe[0]}}> {{equipe[1]}} de {{equipe[2]}} </option>
           {% endfor %}
         </select>  
         <button>Rechercher</button>
@@ -35,12 +36,12 @@
         <label id="label">Partie</label>
         <select name="equipelocal" size="1">
           {% for equipe in equipes %}
-          <option>{{equipe[0]}}</option>
+          <option value={{equipe[0]}}> {{equipe[1]}} de {{equipe[2]}} </option>
           {% endfor %}
         </select>  
         <select name="equipevisiteur" size="1">
           {% for equipe in equipes %}
-          <option>{{equipe[0]}}</option>
+          <option value={{equipe[0]}}> {{equipe[1]}} de {{equipe[2]}} </option>
           {% endfor %}
         </select>  
         <input type="date" name="dateDebut">

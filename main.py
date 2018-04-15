@@ -20,7 +20,7 @@ def accueil(id=None):
         password=userpassword,
         db='basketballer' )
     #TODO
-    cmd='SELECT nom_equipe FROM equipe;'
+    cmd='SELECT num_equipe, nom_equipe, ville FROM equipe;'
     cur=conn.cursor()
     cur.execute(cmd)
     equipes = cur.fetchall()
@@ -90,12 +90,12 @@ def getResultPartie(equipelocal,equipevisiteur,dateDebut, dateFin):
             dateDebut='0000-00-00'
         if not(dateFin): 
             dateFin='9999-12-31'
-        cmd="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe, concoure.points_loc, concoure.points_vis from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND (E1.nom_equipe= %s OR E2.nom_equipe= %s) AND (E2.nom_equipe =%s OR E1.nom_equipe = %s) AND partie.date_partie BETWEEN %s AND %s;"
+        cmd="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe, concoure.points_loc, concoure.points_vis from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND (E1.num_equipe= %s OR E2.num_equipe= %s) AND (E2.nom_equipe =%s OR E1.num_equipe = %s) AND partie.date_partie >= %s  AND partie.date_partie <=  %s ;"
         cur=conn.cursor()
         cur.execute(cmd, (equipelocal,equipelocal,equipevisiteur,equipevisiteur,dateDebut,dateFin))
         info = cur.fetchall()
     else : 
-        cmd2="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe, concoure.points_loc, concoure.points_vis from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND (E1.nom_equipe= %s OR E2.nom_equipe=%s) AND (E2.nom_equipe =%s OR E1.nom_equipe = %s);"
+        cmd2="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe, concoure.points_loc, concoure.points_vis from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND (E1.num_equipe= %s OR E2.num_equipe=%s) AND (E2.num_equipe =%s OR E1.num_equipe = %s);"
         cur=conn.cursor()
         cur.execute(cmd2, (equipelocal,equipelocal,equipevisiteur,equipevisiteur))
         info = cur.fetchall()
@@ -116,8 +116,8 @@ def getJoueur(id=None, saison = None):
         db='basketballer' )
 
     # Tout init à 0
-    nb_revirement_p = nb_revirement_n = nb_lancer_1pt = nb_lancer_2pt = nb_lancer_3pt = nb_panier_1pt = nb_panier_2pt = nb_panier_3pt = 0
-
+    nb_partie = nb_revirement_p = nb_revirement_n = nb_lancer_1pt = nb_lancer_2pt = nb_lancer_3pt = nb_panier_1pt = nb_panier_2pt = nb_panier_3pt = 0
+    moy_assiste = moy_assiste = moy_rebond = moy_faute = moy_vol_balle = moy_revirement =  moy_point = pourcentage_lancer_franc = pourcentage_2pt = pourcentage_3pt = moy_min =0
     cur=conn.cursor()
 
     # Pour notre menu déroulant:
@@ -256,8 +256,8 @@ def getJoueur(id=None, saison = None):
         GROUP BY J.id_joueur;'''
         cur.execute(cmd_carr,(id,id))
         stats = cur.fetchone()
-        nb_partie = stats[1]
-        if(nb_partie): #pour éviter les divisions par 0
+        if(stats): #pour éviter les divisions par 0
+            nb_partie = stats[1]
             nb_lancer_1pt = stats[7]
             nb_panier_1pt = stats[8]
             nb_lancer_2pt = stats[9]
@@ -303,7 +303,7 @@ def equipe():
 
 
 @app.route("/equipe")
-def getEquipe(equipe):
+def getEquipe(id):
     today = date.today()
     ajd = ""+str(today.year)+"-"+str(today.month)+"-"+str(today.day)+""
     conn= pymysql.connect( 
@@ -311,11 +311,7 @@ def getEquipe(equipe):
         user=userid, 
         password=userpassword,
         db='basketballer' )
-    #TODO
-    cmd="SELECT num_equipe FROM equipe WHERE nom_equipe=%s;"
-    cur=conn.cursor()
-    cur.execute(cmd,(equipe,))
-    id = cur.fetchone()[0]
+
     cmd='SELECT * FROM equipe WHERE num_equipe=%s;'
     cur=conn.cursor()
     cur.execute(cmd,(str(id),))
