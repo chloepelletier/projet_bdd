@@ -38,6 +38,9 @@
 		{% for saison in saisons_gagnees %}
           <li>{{saison[0]}}</li>
         {% endfor %}
+        {% if saisons_gagnees==() %}
+        <li>Aucune saison gagnée </li>
+        {% endif %}
         </ul>
       </div>
     </div>  
