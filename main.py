@@ -327,7 +327,10 @@ def getEquipe(equipe):
     if(len(id_partie)==1) : 
         id_partie="("+ str(id_partie[0])+")"
     if (id_partie) :
-        cmd5="SELECT partie.date_partie, E1.nom_equipe, E2.nom_equipe, partie.annee,partie.num_partie, concoure.points_loc, concoure.points_vis FROM partie,concoure, equipe E1, equipe E2 WHERE partie.num_partie=concoure.num_partie AND partie.annee=concoure.annee AND E1.num_equipe = concoure.num_equipe_loc AND E2.num_equipe = concoure.num_equipe_vis AND (partie.num_partie,partie.annee) IN %s;"
+        cmd5="SELECT partie.date_partie, E1.nom_equipe, E2.nom_equipe, partie.annee,partie.num_partie, concoure.points_loc, concoure.points_vis \
+                FROM partie,concoure, equipe E1, equipe E2 WHERE partie.num_partie=concoure.num_partie AND partie.annee=concoure.annee  \
+                AND E1.num_equipe = concoure.num_equipe_loc AND E2.num_equipe = concoure.num_equipe_vis AND (partie.num_partie,partie.annee) IN %s\
+                 GROUP BY annee DESC,num_partie DESC;"
         cur.execute(cmd5,(id_partie,))
         infoPartie = cur.fetchall()
     else : 
@@ -386,7 +389,6 @@ def getPartie(annee=None,num=None):
         type_partie = "Séries - " + ronde + " - Partie " + str(info_serie[1])
     else:
         type_partie = "Saison régulière"
-
     #recuperation des noms d'equipe
     cmd2='SELECT E1.nom_equipe, E2.nom_equipe FROM concoure,equipe E1, equipe E2 WHERE E1.num_equipe = concoure.num_equipe_loc AND E2.num_equipe = concoure.num_equipe_vis AND num_partie =%s AND annee=%s;'
     cur.execute(cmd2,(num,annee))
