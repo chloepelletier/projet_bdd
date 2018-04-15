@@ -239,45 +239,38 @@ def getJoueur(id=None, saison = None):
                 pourcentage_2pt = round((nb_panier_2pt / nb_lancer_2pt) * 100,2)
             if (nb_lancer_3pt):
                 pourcentage_3pt = round((nb_panier_3pt / nb_lancer_3pt) * 100,2)
-        # return render_template('joueur.html', prenom=info[1], nom=info[2],
-        #                        naissance=info[3], taille=info[4], poids=info[5],
-        #                        position=info[6], bras=info[8], numero=info2[4], equipe=info3[1],
-        #                        pays=info3[3], nb_partie=nb_partie, moy_assiste=moy_assiste,
-        #                        moy_rebond=moy_rebond, moy_faute=moy_faute, moy_vol_balle=moy_vol_balle,
-        #                        moy_revirement=moy_revirement, moy_point=moy_point,
-        #                        pourcentage_lancer_franc=pourcentage_lancer_franc,
-        #                        pourcentage_2pt=pourcentage_2pt, pourcentage_3pt=pourcentage_3pt,
-        #                        moy_min=moy_min, saisons=saisons, id=id, saison=saison)
+
     else : #saison = "Carriere"
-        cmd_carr = "SELECT P.id_joueur, P.nb_partie, P.t_minutes, \
-            COUNT(IF(A.type_action='faute' ,1,NULL)) AS nb_faute, \
-            COUNT(IF(A.type_action='rebond',1,NULL)) AS nb_rebond, \
-            COUNT(IF(A.type_action='revirement' AND \
-                (SELECT type_revirement FROM revirement WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant)='offensif' \
-                ,1,NULL)) AS nb_revirement_n, \
-            COUNT(IF(A.type_action='revirement' AND \
-                        (SELECT type_revirement FROM revirement WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant)='defensif' \
-                        ,1,NULL)) AS nb_revirement_p, \
-            COUNT(IF(A.type_action='lancer' AND \
-                (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant) = '1pt' \
-                ,1,NULL)) AS lancerfranc, \
-            COUNT(IF(A.type_action='lancer' AND \
-                (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '1pt'\
-                ,1,NULL)) AS panierfranc, \
-            COUNT(IF(A.type_action='lancer' AND \
-                (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant) = '2pt' \
-                ,1,NULL)) AS lancer2pt, \
-            COUNT(IF(A.type_action='lancer' AND \
-                (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '2pt' \
-                ,1,NULL)) AS panier2pt, \
-            COUNT(IF(A.type_action='lancer' AND \
-                (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant) = '3pt' \
-                ,1,NULL)) AS lancer3pt, \
-            COUNT(IF(A.type_action='lancer' AND \
-                (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '3pt' \
-                ,1,NULL)) AS panier3pt\
-            FROM action A, (SELECT *, COUNT(*) as nb_partie, SUM(minutes) as t_minutes FROM participe P WHERE P.id_joueur = 1) as P \
-            WHERE A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur = P.id_joueur;"
+        cmd_carr = '''SELECT P.id_joueur, P2.nb_partie, SUM(P.minutes),
+        COUNT(IF(A.type_action='faute' ,1,NULL)) AS nb_faute,
+        COUNT(IF(A.type_action='rebond',1,NULL)) AS nb_rebond,
+        COUNT(IF(A.type_action='revirement' AND
+            (SELECT type_revirement FROM revirement WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant)='defensif'
+            ,1,NULL)) AS nb_revirement_p,
+        COUNT(IF(A.type_action='revirement' AND
+            (SELECT type_revirement FROM revirement WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant)='offensif'
+            ,1,NULL)) AS nb_revirement_n,
+        COUNT(IF(A.type_action='lancer' AND
+            (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant) = '1pt'
+            ,1,NULL)) AS lancerfranc,
+        COUNT(IF(A.type_action='lancer' AND
+            (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '1pt'
+            ,1,NULL)) AS panierfranc,
+        COUNT(IF(A.type_action='lancer' AND
+            (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant) = '2pt'
+            ,1,NULL)) AS lancer2pt,
+        COUNT(IF(A.type_action='lancer' AND
+            (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '2pt'
+            ,1,NULL)) AS panier2pt,
+        COUNT(IF(A.type_action='lancer' AND
+            (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant) = '3pt'
+            ,1,NULL)) AS lancer3pt,
+        COUNT(IF(A.type_action='lancer' AND
+            (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '3pt'
+            ,1,NULL)) AS panier3pt
+        FROM action A, joueur J, participe P, (SELECT COUNT(*) as nb_partie FROM participe WHERE id_joueur = '''+id+ ''') as P2
+        WHERE A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur = P.id_joueur AND J.id_joueur=P.id_joueur AND P.id_joueur = '''+id+'''
+        GROUP BY J.id_joueur;'''
         cur.execute(cmd_carr)
         stats = cur.fetchone()
         nb_partie = stats[1]
@@ -289,8 +282,8 @@ def getJoueur(id=None, saison = None):
             nb_lancer_3pt = stats[11]
             nb_panier_3pt = stats[12]
             moy_assiste = 0 / nb_partie #TODO
-            moy_vol_balle = stats[6] / nb_partie
-            moy_revirement = stats[5] / nb_partie
+            moy_vol_balle = stats[5] / nb_partie
+            moy_revirement = stats[6] / nb_partie
             nb_point = nb_panier_1pt + 2*nb_panier_2pt + 3*nb_panier_3pt
             moy_point = nb_point /nb_partie
             if (nb_lancer_1pt):
@@ -302,7 +295,12 @@ def getJoueur(id=None, saison = None):
             moy_min = stats[2] / nb_partie
             moy_rebond = stats[4] / nb_partie
             moy_faute = stats[3] / nb_partie
-        # manque asssists
+        
+            cmd_carr2 = '''SELECT COUNT(*) FROM assiste A, joueur J, participe P
+            WHERE A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur = P.id_joueur AND J.id_joueur=P.id_joueur AND P.id_joueur = 20;'''
+            cur.execute(cmd_carr2)
+            moy_assiste = cur.fetchone()[0] / nb_partie
+
 
     return render_template('joueur.html', prenom=info[1], nom=info[2],
                            naissance=info[3], taille=info[4], poids=info[5],
