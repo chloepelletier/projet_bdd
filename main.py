@@ -348,10 +348,17 @@ def getEquipe(equipe):
         infoJoueur = cur.fetchall()
     else : 
         infoJoueur = ("inconnu","inconnu","inconnu","inconnu","inconnu")
+
+    #trouver les saisons remportées par l'équipe en vérifiant si elle a gagné la dernière partie de la dernière série de chaque saison:
+    cmd4= '''SELECT A.annee, A.annee FROM appartient A, concoure C WHERE A.annee= C.annee AND A.num_serie = 2 AND A.num_partie=C.num_partie
+            AND ((C.num_equipe_loc = %s AND C.points_loc > C.points_vis) OR (C.num_equipe_vis = %s AND C.points_vis > C.points_loc))
+            AND A.num_sous_serie =
+            (SELECT MAX(A2.num_sous_serie) FROM appartient A2 WHERE A2.annee=A.annee); '''
+    cur.execute(cmd4, (str(id),str(id)))
+    saisons_gagnees = cur.fetchall()
+
     return render_template('equipe.html', nom=info[1], ville=info[2],pays=info[3],fondation=info[4],
-                           infoPartie=infoPartie, infoJoueur=infoJoueur)
-
-
+                           infoPartie=infoPartie, infoJoueur=infoJoueur, saisons_gagnees = saisons_gagnees)
 
 
 @app.route("/partie/<annee>/<num>")
