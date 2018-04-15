@@ -37,6 +37,14 @@
      </div>
      <!-- bloc concernant les statistiques de ce joueur -->
      <div class="stats">
+      <form action="saison" method="post">
+        <label>Saison</label>
+        <select name="saisonJoueur" size="1">
+          <option>2017</option>
+          <option>2018</option>
+        </select>
+        <button> Rechercher</button>
+      </form>
       <h2>Statistiques personnelles : </h2>
       <p> Nombre de parties jouées : {{nb_partie}} </p>
       <p> Moyenne des points marqués par partie : {{moy_point}} </p>
