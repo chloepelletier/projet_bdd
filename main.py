@@ -295,7 +295,7 @@ def getJoueur(id=None, saison = None):
             moy_min = stats[2] / nb_partie
             moy_rebond = stats[4] / nb_partie
             moy_faute = stats[3] / nb_partie
-        
+
             cmd_carr2 = '''SELECT COUNT(*) FROM assiste A, joueur J, participe P
             WHERE A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur = P.id_joueur AND J.id_joueur=P.id_joueur AND P.id_joueur = 20;'''
             cur.execute(cmd_carr2)
@@ -385,6 +385,20 @@ def getPartie(annee=None,num=None):
     cur=conn.cursor()
     cur.execute(cmd)
     info = cur.fetchone()
+
+    #récupartion d'info sur le type de partie
+    cmd1 = 'SELECT num_serie, num_sous_serie FROM appartient WHERE num_partie = '+num+' AND annee= '+annee+';'
+    cur.execute(cmd1)
+    info_serie = cur.fetchone()
+    if(info_serie) :
+        if info_serie[0] == 2 :
+            ronde = "Finales"
+        else :
+            ronde = "Ronde 1"
+        type_partie = "Séries - "+ronde+" - Partie "+str(info_serie[1])
+    else:
+        type_partie = "Saison régulière"
+
     #recuperation des noms d'equipe
     cmd2='SELECT E1.nom_equipe, E2.nom_equipe FROM concoure,equipe E1, equipe E2 WHERE E1.num_equipe = concoure.num_equipe_loc AND E2.num_equipe = concoure.num_equipe_vis AND num_partie ='+num+' AND annee='+annee+';'
     cur.execute(cmd2)
@@ -461,7 +475,7 @@ def getPartie(annee=None,num=None):
     cmd5="SELECT action.instant, action.type_action, equipe.nom_equipe, joueur.nom_famille, joueur.prenom FROM action, equipe, contrat, joueur WHERE action.id_joueur = contrat.id_joueur AND contrat.num_equipe = equipe.num_equipe AND joueur.id_joueur = action.id_joueur AND action.num_partie ="+num+" AND action.annee="+annee+";"
     cur.execute(cmd5)
     actions = cur.fetchall()
-    return render_template('partie.html', info=info,equipes=equipes, scores=scores ,joueurs1=joueurs1, joueurs2=joueurs2, actions = actions)
+    return render_template('partie.html', info=info,equipes=equipes, scores=scores ,joueurs1=joueurs1, joueurs2=joueurs2, actions = actions, type_partie = type_partie)
   
         
 
