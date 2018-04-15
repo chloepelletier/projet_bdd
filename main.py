@@ -20,7 +20,7 @@ def accueil(id=None):
         password=userpassword,
         db='basketballer' )
     #TODO
-    cmd='SELECT num_equipe, nom_equipe, ville FROM equipe;'
+    cmd='SELECT num_equipe, nom_equipe, ville FROM equipe GROUP BY nom_equipe;'
     cur=conn.cursor()
     cur.execute(cmd)
     equipes = cur.fetchall()
@@ -45,22 +45,22 @@ def getResult(nom,prenom):
         password=userpassword,
         db='basketballer' )
     if(nom and prenom): 
-        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl >= %s AND joueur.nom_famille=%s AND joueur.prenom= %s;"
+        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl >= %s AND joueur.nom_famille=%s AND joueur.prenom= %s GROUP BY joueur.prenom;"
         cur=conn.cursor()
         cur.execute(cmd,(ajd,nom,prenom))
         info = cur.fetchall()
     elif(nom):
-        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl >= %s AND joueur.nom_famille=%s;"
+        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl >= %s AND joueur.nom_famille=%s GROUP BY joueur.prenom;"
         cur=conn.cursor()
         cur.execute(cmd,(ajd,nom))
         info = cur.fetchall()
     elif(prenom):
-        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl >= %s AND joueur.prenom=%s;"
+        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl >= %s AND joueur.prenom=%s GROUP BY joueur.nom_famille;"
         cur=conn.cursor()
         cur.execute(cmd, (ajd,prenom))
         info = cur.fetchall()
     else : 
-        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl >= %s"
+        cmd="SELECT joueur.id_joueur, joueur.nom_famille, joueur.prenom, equipe.nom_equipe FROM joueur, equipe, contrat WHERE equipe.num_equipe = contrat.num_equipe AND contrat.id_joueur=joueur.id_joueur AND contrat.fin_excl >= %s GROUP BY joueur.nom_famille, joueur.prenom;"
         cur=conn.cursor()
         cur.execute(cmd,ajd)
         info = cur.fetchall()
