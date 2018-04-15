@@ -22,6 +22,7 @@
     <div class="joueur">
       <div class="action">
         <h1> <span class="info">{{nom}} {{prenom}} </span></h1>
+		<h1> <span class="info">Résultats de {{saison}} </span></h1>
       </div>
       <!-- bloc d'informations perso sur le joueur-->
       <div class="perso">
@@ -37,14 +38,6 @@
      </div>
      <!-- bloc concernant les statistiques de ce joueur -->
      <div class="stats">
-      <form action="saison" method="post">
-        <label>Saison</label>
-        <select name="saisonJoueur" size="1">
-          <option>2017</option>
-          <option>2018</option>
-        </select>
-        <button> Rechercher</button>
-      </form>
       <h2>Statistiques personnelles : </h2>
       <p> Nombre de parties jouées : {{nb_partie}} </p>
       <p> Moyenne des points marqués par partie : {{moy_point}} </p>
@@ -57,6 +50,16 @@
       <p> Moyenne des vols de balle par partie : {{moy_vol_balle}} </p>
       <p> Moyenne des revirements par partie : {{moy_revirement}} </p>
       <p> Moyenne des fautes par partie : {{moy_faute}} </p>
+	  <form id='formSaisonJoueur' action="/joueur/{{id}}/saison" method="post">
+        <label>Saison</label>
+        <select name="saisonJoueur" size="1">
+         {% for saison in saisons %}
+          <option>{{saison[0]}}</option>
+          {% endfor %}
+		  <option>Carriere</option>
+        </select>
+        <button> Rechercher</button>
+      </form>
     </div>
   </div>  
 
