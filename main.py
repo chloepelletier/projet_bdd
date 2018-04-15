@@ -19,6 +19,7 @@ def accueil(id=None):
         user=userid, 
         password=userpassword,
         db='basketballer' )
+    #TODO
     cmd='SELECT nom_equipe FROM equipe;'
     cur=conn.cursor()
     cur.execute(cmd)
@@ -156,6 +157,7 @@ def getJoueur(id=None, saison = None):
         info3=("inconnu","inconnu","inconnu","inconnu")
         info2=("inconnu","inconnu","inconnu","inconnu","inconnu")
 
+    #Requêtes différentes si une seule saison (égalité) ou plusieurs (gamme):
     if (saison != "Carriere"):
         #nombre de match joués dans la saison. Enregistré dans variable nb_partie */
         cmd4="SELECT COUNT(*), SUM(P.minutes) FROM participe P WHERE P.id_joueur = %s AND P.annee=%s;"
@@ -174,8 +176,7 @@ def getJoueur(id=None, saison = None):
             cur.execute(cmd6,(saison,id))
             action = cur.fetchall()
             #Moyenne des rebonds et fautes par partie
-            nb_rebond = 0
-            nb_faute = 0
+            nb_rebond = nb_faute = 0
             for Tuple in action:
                 if Tuple[3] == "rebond":
                     nb_rebond +=1
@@ -253,7 +254,7 @@ def getJoueur(id=None, saison = None):
         FROM action A, joueur J, participe P, (SELECT COUNT(*) as nb_partie FROM participe WHERE id_joueur = %s) as P2
         WHERE A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur = P.id_joueur AND J.id_joueur=P.id_joueur AND P.id_joueur = %s
         GROUP BY J.id_joueur;'''
-        cur.execute(cmd_carr,(id,)) #TODO id??
+        cur.execute(cmd_carr,(id,id))
         stats = cur.fetchone()
         nb_partie = stats[1]
         if(nb_partie): #pour éviter les divisions par 0
@@ -263,26 +264,26 @@ def getJoueur(id=None, saison = None):
             nb_panier_2pt = stats[10]
             nb_lancer_3pt = stats[11]
             nb_panier_3pt = stats[12]
-            moy_assiste = 0 / nb_partie #TODO
-            moy_vol_balle = stats[6] / nb_partie
-            moy_revirement = stats[5] / nb_partie
+            moy_vol_balle = round((stats[6] / nb_partie) , 2)
+            moy_revirement = round((stats[5] / nb_partie) , 2)
             nb_point = nb_panier_1pt + 2*nb_panier_2pt + 3*nb_panier_3pt
-            moy_point = nb_point /nb_partie
+            moy_point = round(nb_point /nb_partie, 2)
             if (nb_lancer_1pt):
                 pourcentage_lancer_franc = round((nb_panier_1pt / nb_lancer_1pt) * 100, 2)
             if (nb_lancer_2pt):
                 pourcentage_2pt = round((nb_panier_2pt / nb_lancer_2pt) * 100, 2)
             if (nb_lancer_3pt):
                 pourcentage_3pt = round((nb_panier_3pt / nb_lancer_3pt) * 100, 2)
-            moy_min = stats[2] / nb_partie
-            moy_rebond = stats[4] / nb_partie
-            moy_faute = stats[3] / nb_partie
+            moy_min = round(stats[2] / nb_partie , 2)
+            moy_rebond = round(stats[4] / nb_partie , 2)
+            moy_faute = round( stats[3] / nb_partie , 2)
 
             cmd_carr2 = "SELECT COUNT(*) FROM assiste A, joueur J, participe P \
                         WHERE A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur = P.id_joueur AND J.id_joueur=P.id_joueur AND P.id_joueur = %s;"
-            cur.execute(cmd_carr2,(id,id))
-            moy_assiste = cur.fetchone()[0] / nb_partie
+            cur.execute(cmd_carr2,(id,))
+            moy_assiste = round (cur.fetchone()[0] / nb_partie * 100, 2)
 
+    #S'exécute dans  tous les cas, car les variables containers ont les mêmes noms.
     return render_template('joueur.html', prenom=info[1], nom=info[2],
                            naissance=info[3], taille=info[4], poids=info[5],
                            position=info[6], bras=info[8], numero=info2[4], equipe=info3[1],
@@ -310,6 +311,7 @@ def getEquipe(equipe):
         user=userid, 
         password=userpassword,
         db='basketballer' )
+    #TODO
     cmd="SELECT num_equipe FROM equipe WHERE nom_equipe=%s;"
     cur=conn.cursor()
     cur.execute(cmd,(equipe,))
