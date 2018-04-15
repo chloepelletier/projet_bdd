@@ -90,7 +90,7 @@ def getResultPartie(equipelocal,equipevisiteur,dateDebut, dateFin):
             dateDebut='0000-00-00'
         if not(dateFin): 
             dateFin='9999-12-31'
-        cmd="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe, concoure.points_loc, concoure.points_vis from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND (E1.num_equipe= %s OR E2.num_equipe= %s) AND (E2.nom_equipe =%s OR E1.num_equipe = %s) AND partie.date_partie >= %s  AND partie.date_partie <=  %s ;"
+        cmd="SELECT partie.annee, partie.num_partie, partie.date_partie, E1.nom_equipe, E2.nom_equipe, concoure.points_loc, concoure.points_vis from partie,equipe E1, equipe E2, concoure WHERE E1.num_equipe= concoure.num_equipe_loc AND E2.num_equipe= concoure.num_equipe_vis AND concoure.annee = partie.annee AND concoure.num_partie = partie.num_partie AND (E1.num_equipe= %s OR E2.num_equipe= %s) AND (E2.num_equipe =%s OR E1.num_equipe = %s) AND partie.date_partie >= %s  AND partie.date_partie <=  %s ;"
         cur=conn.cursor()
         cur.execute(cmd, (equipelocal,equipelocal,equipevisiteur,equipevisiteur,dateDebut,dateFin))
         info = cur.fetchall()
