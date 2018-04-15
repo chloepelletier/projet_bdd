@@ -170,6 +170,7 @@ select {
   font-size: 1rem; 
   border-radius: 0; 
   margin-bottom: 20px;
+  margin-top: 20px;
 }
 button {
     width: 100px;
