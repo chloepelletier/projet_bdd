@@ -222,7 +222,9 @@ CREATE TABLE lancer (annee int UNSIGNED, num_partie int UNSIGNED, instant time, 
 	PRIMARY KEY(annee, num_partie, instant),
 	FOREIGN KEY(type_lancer) REFERENCES type_lancer(type),
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
-		ON DELETE CASCADE);
+		ON NO ACTION);
+/* No action car 'CASCADE' ne déclenche pas le trigger de suppression de lancer. */
+
 delimiter //
 CREATE TRIGGER type_action_lancer
 BEFORE INSERT ON lancer
@@ -286,9 +288,9 @@ THEN
 	SET @equipe_local =
 	(SELECT COUNT(*)
 	FROM partie P, concoure Cc, contrat Ct, action A
-		 WHERE P.annee = NEW.annee AND P.num_partie = NEW.num_partie
-		  AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
-		  AND A.annee=NEW.annee AND A.num_partie=NEW.num_partie AND A.instant=NEW.instant
+		 WHERE P.annee = OLD.annee AND P.num_partie = OLD.num_partie
+		  AND Cc.annee = OLD.annee AND Cc.num_partie = OLD.num_partie
+		  AND A.annee=OLD.annee AND A.num_partie=OLD.num_partie AND A.instant=OLD.instant
 		  AND Ct.num_equipe = Cc.num_equipe_loc AND Ct.id_joueur = A.id_joueur
 		  AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl );
 		  
@@ -296,11 +298,11 @@ THEN
 	THEN 
 		UPDATE concoure
 		SET points_loc = points_loc - @points
-		WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
+		WHERE annee=OLD.annee AND num_partie=OLD.num_partie;
 	ELSE
 		UPDATE concoure
 		SET points_vis = points_vis - @points
-		WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
+		WHERE annee=OLD.annee AND num_partie=OLD.num_partie;
 	END IF;
 END IF;
 END;//
@@ -308,56 +310,13 @@ delimiter ;
 
 delimiter //
 CREATE TRIGGER modifier_points_au_panier
-EBFORE UPDATE ON lancer
+AFTER UPDATE ON lancer
 FOR EACH ROW
 BEGIN
-	SET @n_points = (SELECT( 1*COUNT(IF(NEW.type_lancer = "1pt",1,NULL)) +
-			2*COUNT(IF(NEW.type_lancer = "2pt",1,NULL)) +
-			3*COUNT(IF(NEW.type_lancer = "3pt",1,NULL))));
-	SET @o_points= (SELECT( 1*COUNT(IF(OLD.type_lancer = "1pt",1,NULL)) +
-			2*COUNT(IF(OLD.type_lancer = "2pt",1,NULL)) +
-			3*COUNT(IF(OLD.type_lancer = "3pt",1,NULL))));
-	SET @d_points = n_points - o_points;
-	SET @equipe_local =
-		(SELECT COUNT(*)
-		FROM partie P, concoure Cc, contrat Ct, action A
-			 WHERE P.annee = NEW.annee AND P.num_partie = NEW.num_partie
-			  AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
-			  AND A.annee=NEW.annee AND A.num_partie=NEW.num_partie AND A.instant=NEW.instant
-			  AND Ct.num_equipe = Cc.num_equipe_loc AND Ct.id_joueur = A.id_joueur
-			  AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl );
-	IF (OLD.est_panier AND NEW.est_panier) THEN
-		
-		IF(@equipe_local > 0) THEN 
-			UPDATE concoure
-			SET points_loc = points_loc + @d_points
-			WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
-		ELSE
-			UPDATE concoure
-			SET points_vis = points_vis + @d_points
-			WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
-		END IF;
-	ELSEIF(OLD.est_panier AND NOT NEW.est_panier) THEN
-		IF(@equipe_local > 0) THEN 
-			UPDATE concoure
-			SET points_loc = points_loc - @o_points
-			WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
-		ELSE
-			UPDATE concoure
-			SET points_vis = points_vis - @o_points
-			WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
-		END IF;
-	ELSEIF(NOT OLD.est_panier AND NEW.est_panier) THEN
-		IF(@equipe_local > 0) THEN 
-			UPDATE concoure
-			SET points_loc = points_loc + @n_points
-			WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
-		ELSE
-			UPDATE concoure
-			SET points_vis = points_vis + @n_points
-			WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
-		END IF;
-	END IF;
+/* trop de choses peuvent changer. Recalculer les points au complet */
+/*recalcule pour vieille partie */
+
+/*recalcule pour nouvelle partie */
 END;//
 delimiter ;
 
