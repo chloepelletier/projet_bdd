@@ -16,93 +16,79 @@ cmd2 = "create database basketballer;"
 cur.execute(cmd2)
 cmd3 = "use basketballer;"
 cur.execute(cmd3)
-cmd5 = "CREATE TABLE equipe (num_equipe int, nom_equipe char(20), ville char(20), pays char(20), "\
-        "fondation date, PRIMARY KEY(num_equipe));"
+cmd5 = """CREATE TABLE equipe (num_equipe int UNSIGNED, nom_equipe char(20), ville char(20), pays char(20),
+	fondation date, PRIMARY KEY(num_equipe));"""
 cur.execute(cmd5)
-cmd6 = "CREATE TABLE joueur (id_joueur int, prenom char(20), nom_famille char(20), naissance date, "\
-        "taille_ft real, poids_lbs real, role char(20), est_droitier bool, dist_bras_ft real, PRIMARY KEY(id_joueur));"
+cmd6 = """CREATE TABLE joueur (id_joueur int UNSIGNED, prenom char(20),
+	nom_famille char(20), naissance date, taille_ft real UNSIGNED, poids_lbs real UNSIGNED,
+	role char(20), est_droitier bool, dist_bras_ft real UNSIGNED,
+	PRIMARY KEY(id_joueur));"""
 cur.execute(cmd6)
-cmd7 = "CREATE TABLE partie (annee int, num_partie int, ville char(20), date_partie date, PRIMARY KEY(annee, num_partie));"
+cmd7 = """CREATE TABLE partie (annee int UNSIGNED, num_partie int UNSIGNED, ville char(20), date_partie date,
+	PRIMARY KEY(annee, num_partie));"""
 cur.execute(cmd7)
-cmd8 = "CREATE TABLE serie (annee int, num_serie int, PRIMARY KEY(annee, num_serie));"
+cmd8 = "CREATE TABLE serie (annee int UNSIGNED, num_serie int UNSIGNED, PRIMARY KEY(annee, num_serie));"
 cur.execute(cmd8)
-cmd9 = "CREATE TABLE appartient(annee int, num_partie int NOT NULL, num_serie int NOT NULL, "\
-        "num_sous_serie int NOT NULL, PRIMARY KEY(annee, num_serie, num_sous_serie), UNIQUE (annee, num_partie), "\
-        "FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE, FOREIGN KEY(annee, num_serie) "\
-        "REFERENCES serie(annee, num_serie) ON DELETE CASCADE);"
+cmd9 = """CREATE TABLE appartient(annee int UNSIGNED, num_partie int UNSIGNED NOT NULL, num_serie int UNSIGNED NOT NULL, num_sous_serie int UNSIGNED NOT NULL,
+	PRIMARY KEY(annee, num_serie, num_sous_serie),
+	UNIQUE (annee, num_partie),
+	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
+	FOREIGN KEY(annee, num_serie) REFERENCES serie(annee, num_serie) ON DELETE CASCADE);"""
 cur.execute(cmd9)
-cmd10 = '''
-CREATE TRIGGER max7_parties_par_serie
-BEFORE INSERT ON appartient
-FOR EACH ROW
-BEGIN
-IF  (0 >= NEW.num_sous_serie) OR (NEW.num_sous_serie > 7)
-OR
-(	SELECT COUNT(*)
-	FROM appartient
-	WHERE annee=NEW.annee AND num_serie = NEW.num_serie
-	) = 7
-THEN SET NEW.annee = null;
-END IF;
-END; '''
+cmd10 = """
+    CREATE TRIGGER max7_parties_par_serie
+    BEFORE INSERT ON appartient
+    FOR EACH ROW
+    BEGIN
+    IF  (0 >= NEW.num_sous_serie) OR (NEW.num_sous_serie > 7)
+    OR
+    (	SELECT COUNT(*)
+        FROM appartient
+        WHERE annee=NEW.annee AND num_serie = NEW.num_serie
+        ) = 7
+    THEN SET NEW.annee = null;
+    END IF;
+    END; """
 cur.execute(cmd10)
-cmd11 = "CREATE TRIGGER ordre_chronologique_serie"\
-        " BEFORE INSERT ON appartient"\
-        " FOR EACH ROW"\
-        " BEGIN"\
-        " IF (EXISTS (SELECT NULL"\
-        "                        FROM appartient A, partie PN, partie P1"\
-        "                        WHERE A.annee=NEW.annee AND A.num_serie=NEW.num_serie"\
-        "                        AND A.num_sous_serie =(NEW.num_sous_serie-1)"\
-        "                        AND PN.annee = A.annee and PN.num_partie = A.num_partie"\
-        "                        AND P1.annee = A.annee AND P1.num_partie = A.num_partie"\
-        "                        AND P1.date_partie > PN.date_partie))"\
-        " OR"\
-        " (EXISTS (SELECT NULL"\
-        "                        FROM appartient A, partie PN, partie P2"\
-        "                        WHERE A.annee=NEW.annee AND A.num_serie=NEW.num_serie"\
-        "                        AND A.num_sous_serie =(NEW.num_sous_serie+1)"\
-        "                        AND PN.annee = A.annee and PN.num_partie = A.num_partie"\
-        "                        AND P2.annee = A.annee AND P2.num_partie = A.num_partie"\
-        "                        AND P2.date_partie < PN.date_partie))"\
-        " THEN SET NEW.annee = null;"\
-        " END IF;"\
-        " END;"
+cmd11 = """ CREATE TRIGGER ordre_chronologique_serie
+    BEFORE INSERT ON appartient
+    FOR EACH ROW
+    BEGIN
+    IF (EXISTS (SELECT NULL
+                FROM appartient A, partie PN, partie P1
+                WHERE A.annee=NEW.annee AND A.num_serie=NEW.num_serie
+                AND A.num_sous_serie =(NEW.num_sous_serie-1)
+                AND PN.annee = A.annee and PN.num_partie = A.num_partie
+                AND P1.annee = A.annee AND P1.num_partie = A.num_partie
+                AND P1.date_partie > PN.date_partie))
+    OR
+    (EXISTS (SELECT NULL
+                FROM appartient A, partie PN, partie P2
+                WHERE A.annee=NEW.annee AND A.num_serie=NEW.num_serie
+                AND A.num_sous_serie =(NEW.num_sous_serie+1)
+                AND PN.annee = A.annee and PN.num_partie = A.num_partie
+                AND P2.annee = A.annee AND P2.num_partie = A.num_partie
+                AND P2.date_partie < PN.date_partie))
+    THEN SET NEW.annee = null;
+    END IF;
+    END;"""
 cur.execute(cmd11)
-cmd12 = "CREATE TABLE concoure(annee int, num_partie int, num_equipe_loc int NOT NULL, num_equipe_vis int NOT NULL,"\
-	" points_loc int, points_vis int, PRIMARY KEY(annee, num_partie),"\
-	" FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,"\
-	" FOREIGN KEY(num_equipe_loc) REFERENCES equipe(num_equipe) ON DELETE CASCADE,"\
-	" FOREIGN KEY(num_equipe_vis) REFERENCES equipe(num_equipe) ON DELETE CASCADE);"
+cmd12 = """CREATE TABLE concoure(annee int UNSIGNED, num_partie int UNSIGNED, num_equipe_loc int UNSIGNED NOT NULL, num_equipe_vis int UNSIGNED NOT NULL,
+	points_loc int UNSIGNED DEFAULT 0, points_vis int UNSIGNED DEFAULT 0,
+	PRIMARY KEY(annee, num_partie),
+	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
+	FOREIGN KEY(num_equipe_loc) REFERENCES equipe(num_equipe) ON DELETE CASCADE,
+	FOREIGN KEY(num_equipe_vis) REFERENCES equipe(num_equipe) ON DELETE CASCADE);"""
 cur.execute(cmd12)
-cmd13 = " CREATE TRIGGER points_null"\
-        " BEFORE INSERT ON concoure"\
-        " FOR EACH ROW"\
-        " BEGIN"\
-        "        IF (NEW.points_loc IS null)"\
-        "        THEN SET NEW.points_loc = 0;"\
-        "        END IF;"\
-        "        IF (NEW.points_vis IS null)"\
-        "        THEN SET NEW.points_vis = 0;"\
-        "        END IF;"\
-        " END;"
-cur.execute(cmd13)
-cmd14 = "CREATE TABLE contrat(num_equipe int NOT NULL, id_joueur int NOT NULL,"\
-	" debut_incl date NOT NULL, fin_excl date, dossard int NOT NULL,"\
-	" PRIMARY KEY(id_joueur, debut_incl),"\
-	" UNIQUE (num_equipe, debut_incl, dossard),"\
-	" FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE,"\
-	" FOREIGN KEY(num_equipe) REFERENCES equipe(num_equipe) ON DELETE CASCADE);"
+
+cmd14 = """CREATE TABLE contrat(num_equipe int UNSIGNED NOT NULL, id_joueur int UNSIGNED NOT NULL,
+	debut_incl date NOT NULL, fin_excl date DEFAULT '9999-12-31' NOT NULL, dossard int UNSIGNED NOT NULL,
+	PRIMARY KEY(id_joueur, debut_incl),
+	UNIQUE (num_equipe, debut_incl, dossard),
+	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE,
+	FOREIGN KEY(num_equipe) REFERENCES equipe(num_equipe) ON DELETE CASCADE);"""
 cur.execute(cmd14)
-cmd15 = "CREATE TRIGGER fin_contrat_null"\
-        " BEFORE INSERT ON contrat"\
-        " FOR EACH ROW"\
-        " BEGIN"\
-        "        IF (NEW.fin_excl IS null)"\
-        "        THEN SET NEW.fin_excl = '9999-12-31';"\
-        "        END IF;"\
-        " END;"
-cur.execute(cmd15)
+
 cmd16 = "CREATE TRIGGER date_coherentes"\
         " BEFORE INSERT ON contrat"\
         " FOR EACH ROW"\
@@ -140,201 +126,236 @@ cmd18 = "CREATE TRIGGER max_1_contrat"\
         " END IF;"\
         " END;"
 cur.execute(cmd18)
-cmd19 = "CREATE TABLE participe(id_joueur int, annee int, num_partie int NOT NULL, minutes int,"\
-	"PRIMARY KEY(annee, num_partie, id_joueur),"\
-	"FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,"\
-	"FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE);"
+cmd19 = """CREATE TABLE participe(id_joueur int UNSIGNED, annee int UNSIGNED, num_partie int UNSIGNED NOT NULL, minutes int UNSIGNED DEFAULT 0,
+	PRIMARY KEY(annee, num_partie, id_joueur),
+	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
+	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE);"""
 cur.execute(cmd19)
-cmd20 = "CREATE TRIGGER joueur_bonne_equipe"\
-        " BEFORE INSERT ON participe"\
-        " FOR EACH ROW"\
-        " BEGIN"\
-        " IF(SELECT COUNT(*)"\
-        "     FROM partie P, concoure Cc, contrat Ct"\
-        "     WHERE P.annee = NEW.annee AND P.num_partie = NEW.num_partie"\
-        "      AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie"\
-        "      AND (Ct.num_equipe = Cc.num_equipe_loc OR Ct.num_equipe = Cc.num_equipe_vis) AND Ct.id_joueur = NEW.id_joueur"\
-        "      AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl"\
-        "    ) <> 1"\
-        " THEN SET NEW.id_joueur = null;"\
-        " END IF;"\
-        " END;"
+cmd20 = """CREATE TRIGGER joueur_bonne_equipe
+    BEFORE INSERT ON participe
+    FOR EACH ROW
+    BEGIN
+    IF(SELECT COUNT(*)
+         FROM partie P, concoure Cc, contrat Ct
+         WHERE P.annee = NEW.annee AND P.num_partie = NEW.num_partie
+          AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
+          AND (Ct.num_equipe = Cc.num_equipe_loc OR Ct.num_equipe = Cc.num_equipe_vis) AND Ct.id_joueur = NEW.id_joueur
+          AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl
+        ) <> 1
+    THEN SET NEW.id_joueur = null;
+    END IF;
+    END;"""
 cur.execute(cmd20)
-cmd21 = "CREATE TRIGGER 12_joueurs_par_equipe"\
-        " BEFORE INSERT ON participe"\
-        " FOR EACH ROW"\
-        " BEGIN"\
-        " IF	(SELECT COUNT(Ct2.id_joueur)"\
-        "        FROM partie Pe, participe Pp, concoure Cc, contrat Ct1, contrat ct2"\
-        "        WHERE Pe.annee = NEW.annee AND Pe.num_partie = NEW.num_partie"\
-        "         AND Pp.annee = NEW.annee AND Pp.num_partie = NEW.num_partie"\
-        "         AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie"\
-        "         AND Ct1.num_equipe = Cc.num_equipe_loc AND Ct1.id_joueur = NEW.id_joueur "\
-        "         AND Ct1.debut_incl <= Pe.date_partie AND Pe.date_partie < Ct1.fin_excl"\
-        "         AND Ct2.num_equipe = Ct1.num_equipe AND Ct2.id_joueur = Pp.id_joueur"\
-        "         AND Ct2.debut_incl <= Pe.date_partie AND Pe.date_partie < Ct2.fin_excl"\
-        "        ) = 12 "\
-        " THEN SET NEW.id_joueur = null;"\
-        " END IF;"\
-        " END;"
+cmd21 = """CREATE TRIGGER 12_joueurs_par_equipe
+    BEFORE INSERT ON participe
+    FOR EACH ROW
+    BEGIN
+    IF	(SELECT COUNT(Ct2.id_joueur)
+        FROM partie Pe, participe Pp, concoure Cc, contrat Ct1, contrat ct2
+            WHERE Pe.annee = NEW.annee AND Pe.num_partie = NEW.num_partie
+             AND Pp.annee = NEW.annee AND Pp.num_partie = NEW.num_partie
+             AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
+             AND Ct1.num_equipe = Cc.num_equipe_loc AND Ct1.id_joueur = NEW.id_joueur
+             AND Ct1.debut_incl <= Pe.date_partie AND Pe.date_partie < Ct1.fin_excl
+         AND Ct2.num_equipe = Ct1.num_equipe AND Ct2.id_joueur = Pp.id_joueur
+         AND Ct2.debut_incl <= Pe.date_partie AND Pe.date_partie < Ct2.fin_excl
+        ) = 12
+    THEN SET NEW.id_joueur = null;
+    END IF;
+    END;"""
 cur.execute(cmd21)
-cmd22 = "CREATE TABLE type_action(type char(20), PRIMARY KEY(type));"
+cmd22 = """CREATE TABLE type_action(type char(20), PRIMARY KEY(type));"""
 cur.execute(cmd22)
 cmd23 = "INSERT INTO type_action VALUES ('"'lancer'"'), ('"'revirement'"'), ('"'faute'"'), ('"'rebond'"');"
 cur.execute(cmd23)
-cmd24 = "CREATE TABLE action (annee int, num_partie int, instant time, type_action char(20),"\
-	"id_joueur int NOT NULL,"\
-	"PRIMARY KEY(annee, num_partie, instant),"\
-	"FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,"\
-	"FOREIGN KEY(type_action) REFERENCES type_action(type) ON DELETE CASCADE,"\
-	"FOREIGN KEY(annee, num_partie,id_joueur) REFERENCES participe(annee, num_partie,id_joueur)"\
-	"ON DELETE CASCADE);"
+cmd24 = """CREATE TABLE action (annee int UNSIGNED, num_partie int UNSIGNED, instant time, type_action char(20),
+	id_joueur int UNSIGNED NOT NULL,
+	PRIMARY KEY(annee, num_partie, instant),
+	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
+	FOREIGN KEY(type_action) REFERENCES type_action(type) ON DELETE CASCADE,
+	FOREIGN KEY(annee, num_partie,id_joueur) REFERENCES participe(annee, num_partie,id_joueur)
+		ON DELETE CASCADE);"""
 cur.execute(cmd24)
 cmd24 = "CREATE TABLE type_lancer(type char(20), PRIMARY KEY(type));"
 cur.execute(cmd24)
 cmd25 = "INSERT INTO type_lancer VALUES ('"'1pt'"'), ('"'2pt'"'), ('"'3pt'"');"
 cur.execute(cmd25)
-cmd26 = "CREATE TABLE lancer (annee int, num_partie int, instant time, type_lancer char(20) NOT NULL, est_panier bool NOT NULL,"\
-	"PRIMARY KEY(annee, num_partie, instant),"\
-	"FOREIGN KEY(type_lancer) REFERENCES type_lancer(type),"\
-	"FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)"\
-	"ON DELETE CASCADE);"
+cmd26 = """CREATE TABLE lancer (annee int UNSIGNED, num_partie int UNSIGNED, instant time, type_lancer char(20) NOT NULL, est_panier bool NOT NULL,
+	PRIMARY KEY(annee, num_partie, instant),
+	FOREIGN KEY(type_lancer) REFERENCES type_lancer(type),
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
+		ON DELETE NO ACTION);"""
 cur.execute(cmd26)
-cmd27 = "CREATE TRIGGER type_action_lancer"\
-        " BEFORE INSERT ON lancer"\
-        " FOR EACH ROW"\
-        " BEGIN"\
-        "        IF (	SELECT type_action"\
-        "                FROM action"\
-        "                WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)"\
-        "         <> '"'lancer'"'"\
-        "        THEN SET NEW.instant = null;"\
-        "        END IF;"\
-        " END;"
+cmd27 = """CREATE TRIGGER type_action_lancer
+    BEFORE INSERT ON lancer
+    FOR EACH ROW
+    BEGIN
+        IF (	SELECT type_action
+            FROM action
+            WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
+         <> "lancer"
+        THEN SET NEW.instant = null;
+        END IF;
+    END;"""
 cur.execute(cmd27)
-cmd28 = "CREATE TRIGGER update_points_au_panier"\
-        " BEFORE INSERT ON lancer"\
-        " FOR EACH ROW"\
-        " BEGIN"\
-        " IF (NEW.est_panier)"\
-        " THEN"\
-        "    SET @points = (SELECT( 1*COUNT(IF(NEW.type_lancer = '"'1pt'"',1,NULL)) +"\
-        "                        2*COUNT(IF(NEW.type_lancer = '"'2pt'"',1,NULL)) +"\
-        "                        3*COUNT(IF(NEW.type_lancer = '"'3pt'"',1,NULL))));"\
-        "        SET @equipe_local ="\
-        "        (SELECT COUNT(*)"\
-        "        FROM partie P, concoure Cc, contrat Ct, action A"\
-        "                 WHERE P.annee = NEW.annee AND P.num_partie = NEW.num_partie"\
-        "                  AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie"\
-        "                  AND A.annee=NEW.annee AND A.num_partie=NEW.num_partie AND A.instant=NEW.instant"\
-        "                  AND Ct.num_equipe = Cc.num_equipe_loc AND Ct.id_joueur = A.id_joueur"\
-        "                  AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl );"\
-        "        IF(@equipe_local > 0)"\
-        "        THEN "\
-        "                UPDATE concoure"\
-        "                SET points_loc = points_loc + @points"\
-        "                WHERE annee=NEW.annee AND num_partie=NEW.num_partie;"\
-        "        ELSE"\
-        "                UPDATE concoure"\
-        "                SET points_vis = points_vis + @points"\
-        "                WHERE annee=NEW.annee AND num_partie=NEW.num_partie;"\
-        "        END IF;"\
-        " END IF;"\
-        " END;"
+cmd28 = """CREATE TRIGGER update_points_au_panier
+    BEFORE INSERT ON lancer
+    FOR EACH ROW
+    BEGIN
+    IF (NEW.est_panier)
+    THEN
+        SET @points = (SELECT( 1*COUNT(IF(NEW.type_lancer = "1pt",1,NULL)) +
+                2*COUNT(IF(NEW.type_lancer = "2pt",1,NULL)) +
+                3*COUNT(IF(NEW.type_lancer = "3pt",1,NULL))));
+
+        SET @equipe_local =
+        (SELECT COUNT(*)
+        FROM partie P, concoure Cc, contrat Ct, action A
+             WHERE P.annee = NEW.annee AND P.num_partie = NEW.num_partie
+              AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
+              AND A.annee=NEW.annee AND A.num_partie=NEW.num_partie AND A.instant=NEW.instant
+              AND Ct.num_equipe = Cc.num_equipe_loc AND Ct.id_joueur = A.id_joueur
+              AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl );
+
+        IF(@equipe_local > 0)
+        THEN
+            UPDATE concoure
+            SET points_loc = points_loc + @points
+            WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
+        ELSE
+            UPDATE concoure
+            SET points_vis = points_vis + @points
+            WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
+        END IF;
+
+    END IF;
+    END;"""
 cur.execute(cmd28)
-cmd29 = "CREATE TABLE assiste(id_joueur int NOT NULL, annee int, num_partie int, instant time,"\
-	"PRIMARY KEY(annee, num_partie, instant),"\
-	"FOREIGN KEY(annee, num_partie, instant) REFERENCES lancer(annee, num_partie, instant)"\
-	"ON DELETE CASCADE,"\
-	"FOREIGN KEY(annee, num_partie,id_joueur) REFERENCES participe(annee, num_partie,id_joueur)"\
-	"ON DELETE CASCADE);"
+cmd2802="""CREATE TRIGGER retirer_points_au_panier
+    AFTER DELETE ON lancer
+    FOR EACH ROW
+    BEGIN
+    IF (OLD.est_panier)
+    THEN
+        SET @points = (SELECT( 1*COUNT(IF(OLD.type_lancer = "1pt",1,NULL)) +
+                2*COUNT(IF(OLD.type_lancer = "2pt",1,NULL)) +
+                3*COUNT(IF(OLD.type_lancer = "3pt",1,NULL))));
+
+        SET @equipe_local =
+        (SELECT COUNT(*)
+        FROM partie P, concoure Cc, contrat Ct, action A
+             WHERE P.annee = OLD.annee AND P.num_partie = OLD.num_partie
+              AND Cc.annee = OLD.annee AND Cc.num_partie = OLD.num_partie
+              AND A.annee=OLD.annee AND A.num_partie=OLD.num_partie AND A.instant=OLD.instant
+              AND Ct.num_equipe = Cc.num_equipe_loc AND Ct.id_joueur = A.id_joueur
+              AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl );
+
+        IF(@equipe_local > 0)
+        THEN
+            UPDATE concoure
+            SET points_loc = points_loc - @points
+            WHERE annee=OLD.annee AND num_partie=OLD.num_partie;
+        ELSE
+            UPDATE concoure
+            SET points_vis = points_vis - @points
+            WHERE annee=OLD.annee AND num_partie=OLD.num_partie;
+        END IF;
+    END IF;
+    END;"""
+cur.execute(cmd2802)
+cmd29 = """CREATE TABLE assiste(id_joueur int UNSIGNED NOT NULL, annee int UNSIGNED, num_partie int UNSIGNED, instant time,
+	PRIMARY KEY(annee, num_partie, instant),
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES lancer(annee, num_partie, instant)
+		ON DELETE CASCADE,
+	FOREIGN KEY(annee, num_partie,id_joueur) REFERENCES participe(annee, num_partie,id_joueur)
+		ON DELETE CASCADE);"""
 cur.execute(cmd29)
-cmd30 = "CREATE TRIGGER assiste_panier"\
-        " BEFORE INSERT ON assiste"\
-        " FOR EACH ROW"\
-        " BEGIN"\
-        "        IF (	SELECT est_panier"\
-        "                FROM lancer"\
-        "                WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)"\
-        "         = false"\
-        "        THEN SET NEW.instant = null;"\
-        "        END IF;"\
-        " END;"
+cmd30 = """CREATE TRIGGER assiste_panier
+    BEFORE INSERT ON assiste
+    FOR EACH ROW
+    BEGIN
+        IF (	SELECT est_panier
+            FROM lancer
+            WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
+         = false
+        THEN SET NEW.instant = null;
+        END IF;
+    END;"""
 cur.execute(cmd30)
-cmd31 = "CREATE TRIGGER assiste_mauvaise_equipe"\
-        " BEFORE INSERT ON assiste"\
-        " FOR EACH ROW"\
-        " BEGIN"\
-        " IF(SELECT COUNT(*)"\
-        "     FROM action A, partie P, contrat Ct1, contrat Ct2"\
-        "     WHERE  A.annee = NEW.annee AND A.num_partie = NEW.num_partie AND A.instant = NEW.instant"\
-        "        AND P.annee = NEW.annee AND P.num_partie = NEW.num_partie"\
-        "        AND Ct1.id_joueur = A.id_joueur"\
-        "        AND Ct1.debut_incl <= P.date_partie AND P.date_partie < Ct1.fin_excl"\
-        "        AND Ct2.num_equipe = Ct1.num_equipe AND Ct2.id_joueur = NEW.id_joueur"\
-        "        AND Ct2.debut_incl <= P.date_partie AND P.date_partie < Ct2.fin_excl"\
-        "    ) = 0"\
-        " THEN SET NEW.instant = null;"\
-        " END IF;"\
-        " END;"
+cmd31 = """CREATE TRIGGER assiste_mauvaise_equipe
+    BEFORE INSERT ON assiste
+    FOR EACH ROW
+    BEGIN
+    IF(SELECT COUNT(*)
+         FROM action A, partie P, contrat Ct1, contrat Ct2
+         WHERE  A.annee = NEW.annee AND A.num_partie = NEW.num_partie AND A.instant = NEW.instant
+        AND P.annee = NEW.annee AND P.num_partie = NEW.num_partie
+            AND Ct1.id_joueur = A.id_joueur
+            AND Ct1.debut_incl <= P.date_partie AND P.date_partie < Ct1.fin_excl
+        AND Ct2.num_equipe = Ct1.num_equipe AND Ct2.id_joueur = NEW.id_joueur
+        AND Ct2.debut_incl <= P.date_partie AND P.date_partie < Ct2.fin_excl
+        ) = 0
+    THEN SET NEW.instant = null;
+    END IF;
+    END;"""
 cur.execute(cmd31)
 cmd32 = "CREATE TABLE type_faute(type char(20), PRIMARY KEY(type));"
 cur.execute(cmd32)
 cmd33 = "INSERT INTO type_faute VALUES ('"'offensif'"'), ('"'defensif'"');"
 cur.execute(cmd33)
-cmd34 = "CREATE TABLE revirement (annee int, num_partie int, instant time, type_revirement char(20) NOT NULL,"\
-	"PRIMARY KEY(annee, num_partie, instant),"\
-	"FOREIGN KEY(type_revirement) REFERENCES type_faute(type),"\
-	"FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)"\
-	"ON DELETE CASCADE);"
+cmd34 = """CREATE TABLE revirement (annee int UNSIGNED, num_partie int UNSIGNED, instant time, type_revirement char(20) NOT NULL,
+	PRIMARY KEY(annee, num_partie, instant),
+	FOREIGN KEY(type_revirement) REFERENCES type_faute(type),
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
+		ON DELETE CASCADE);"""
 cur.execute(cmd34)
-cmd35 = "CREATE TRIGGER type_action_revirement"\
-        " BEFORE INSERT ON revirement"\
-        " FOR EACH ROW"\
-        " BEGIN"\
-        "        IF (	SELECT type_action"\
-        "                FROM action"\
-        "                WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)"\
-        "         <> '"'revirement'"'"\
-        "        THEN SET NEW.instant = null;"\
-        "        END IF;"\
-        " END;"
+cmd35 = """CREATE TRIGGER type_action_revirement
+    BEFORE INSERT ON revirement
+    FOR EACH ROW
+    BEGIN
+        IF (	SELECT type_action
+            FROM action
+            WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
+         <> "revirement"
+        THEN SET NEW.instant = null;
+        END IF;
+    END;"""
 cur.execute(cmd35)
-cmd36 = "CREATE TABLE faute (annee int, num_partie int, instant time, type_faute char(20) NOT NULL,"\
-	"PRIMARY KEY(annee, num_partie, instant),"\
-	"FOREIGN KEY(type_faute) REFERENCES type_faute(type),"\
-	"FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)"\
-	"ON DELETE CASCADE);"
+cmd36 = """CREATE TABLE faute (annee int UNSIGNED, num_partie int UNSIGNED, instant time, type_faute char(20) NOT NULL,
+	PRIMARY KEY(annee, num_partie, instant),
+	FOREIGN KEY(type_faute) REFERENCES type_faute(type),
+	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
+		ON DELETE CASCADE);"""
 cur.execute(cmd36)
-cmd37 = "CREATE TRIGGER type_action_faute"\
-        " BEFORE INSERT ON faute"\
-        " FOR EACH ROW"\
-        " BEGIN"\
-        "        IF (	SELECT type_action"\
-        "                FROM action"\
-        "                WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)"\
-        "         <> '"'faute'"'"\
-        "        THEN SET NEW.instant = null;"\
-        "        END IF;"\
-        " END;"
+cmd37 = """CREATE TRIGGER type_action_faute
+    BEFORE INSERT ON faute
+    FOR EACH ROW
+    BEGIN
+        IF (	SELECT type_action
+            FROM action
+            WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
+         <> "faute"
+        THEN SET NEW.instant = null;
+        END IF;
+    END;"""
 cur.execute(cmd37)
-cmd38 = "CREATE TABLE rebond (annee int, num_partie int, instant time, type_rebond char(20) NOT NULL,"\
-	"PRIMARY KEY(annee, num_partie, instant),"\
-	"FOREIGN KEY(type_rebond) REFERENCES type_faute(type),"\
-	"FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant) "\
-	"ON DELETE CASCADE);"
+cmd38 = """CREATE TABLE rebond (annee int UNSIGNED, num_partie int UNSIGNED, instant time, type_rebond char(20) NOT NULL,
+        PRIMARY KEY(annee, num_partie, instant),
+        FOREIGN KEY(type_rebond) REFERENCES type_faute(type),
+        FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
+            ON DELETE CASCADE);"""
 cur.execute(cmd38)
-cmd39 = "CREATE TRIGGER type_action_rebond"\
-        " BEFORE INSERT ON rebond"\
-        " FOR EACH ROW"\
-        " BEGIN"\
-        "        IF (	SELECT type_action"\
-        "                FROM action"\
-        "                WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)"\
-        "         <> '"'rebond'"'"\
-        "        THEN SET NEW.instant = null;"\
-        "        END IF;"\
-        " END;"
+cmd39 = """CREATE TRIGGER type_action_rebond
+    BEFORE INSERT ON rebond
+    FOR EACH ROW
+    BEGIN
+        IF (	SELECT type_action
+            FROM action
+            WHERE annee = NEW.annee AND num_partie = NEW.num_partie AND instant = NEW.instant)
+         <> "rebond"
+        THEN SET NEW.instant = null;
+        END IF;
+    END;"""
 cur.execute(cmd39)
 
 

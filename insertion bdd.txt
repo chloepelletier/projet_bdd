@@ -99,37 +99,37 @@ VALUES   (2018, 1, 1, 2),
 	 (2017, 1, 1, 3),
 	 (2016, 1, 2, 1);
 
-INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
-VALUES	(1,1,'2010-03-12',NULL,1),
-	(1,2,'2010-03-12',NULL,2),
-	(1,3,'2010-03-12',NULL,3),
-	(1,4,'2010-03-12',NULL,4),
-	(1,5,'2010-03-12',NULL,5),
-	(1,6,'2010-03-12',NULL,6),
-	(1,7,'2010-03-12',NULL,7),
-	(1,8,'2010-03-12',NULL,8),
-	(1,9,'2010-03-12',NULL,9),
-	(1,10,'2010-03-12',NULL,10),
-	(1,11,'2010-03-12',NULL,11),
-	(1,12,'2010-03-12',NULL,12);
+INSERT INTO contrat(num_equipe, id_joueur, debut_incl, dossard)
+VALUES	(1,1,'2010-03-12',1),
+	(1,2,'2010-03-12',2),
+	(1,3,'2010-03-12',3),
+	(1,4,'2010-03-12',4),
+	(1,5,'2010-03-12',5),
+	(1,6,'2010-03-12',6),
+	(1,7,'2010-03-12',7),
+	(1,8,'2010-03-12',8),
+	(1,9,'2010-03-12',9),
+	(1,10,'2010-03-12',10),
+	(1,11,'2010-03-12',11),
+	(1,12,'2010-03-12',12);
 
-INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
-VALUES(2,1,'2012-05-12',NULL,13); /* Doit échouer, contrats en conflit */
-INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
+INSERT INTO contrat(num_equipe, id_joueur, debut_incl, dossard)
+VALUES(2,1,'2012-05-12',13); /* Doit échouer, contrats en conflit */
+INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl,  dossard)
 VALUES(1,13,'2010-03-12','2010-03-12',13); /* Doit échouer, datesincohérentes */
-INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
+INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl,  dossard)
 VALUES(1,13,'2010-03-12','2009-03-12',13); /* Doit échouer, datesincohérentes */
-INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
-VALUES(1,13,'2010-03-12',NULL,1); /* Doit échouer, même dossard */
-INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
-VALUES(1,13,'2010-03-12',NULL,13);
+INSERT INTO contrat(num_equipe, id_joueur, debut_incl, dossard)
+VALUES(1,13,'2010-03-12',1); /* Doit échouer, même dossard */
+INSERT INTO contrat(num_equipe, id_joueur, debut_incl, dossard)
+VALUES(1,13,'2010-03-12',13);
 
-INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
-VALUES	(2,14,'2010-03-12',NULL,1),
-	(2,15,'2010-03-12',NULL,2);
+INSERT INTO contrat(num_equipe, id_joueur, debut_incl,  dossard)
+VALUES	(2,14,'2010-03-12',1),
+	(2,15,'2010-03-12',2);
 
-INSERT INTO contrat(num_equipe, id_joueur, debut_incl, fin_excl, dossard)
-VALUES	(3,16,'2010-03-12',NULL,1);
+INSERT INTO contrat(num_equipe, id_joueur, debut_incl,  dossard)
+VALUES	(3,16,'2010-03-12',1);
 
 
 INSERT INTO participe(id_joueur, annee, num_partie , minutes)
