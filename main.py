@@ -374,7 +374,6 @@ def getPartie(annee=None,num=None):
     cur=conn.cursor()
     cur.execute(cmd,(num,annee))
     info = cur.fetchone()
-
     # récupartion d'info sur le type de partie
     cmd1 = 'SELECT num_serie, num_sous_serie FROM appartient WHERE num_partie = %s AND annee= %s;'
     cur.execute(cmd1,(num,annee))
@@ -396,67 +395,61 @@ def getPartie(annee=None,num=None):
     cur.execute(cmd6,(num,annee))
     scores = cur.fetchone()
     #liste joueur equipe 1 
-    cmd3="SELECT J.id_joueur, Ct.dossard,J.nom_famille, J.prenom, J.role, PA.minutes,"\
-    "COUNT(IF(A.type_action='faute'  AND A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur=J.id_joueur,1,NULL)) AS nb_faute,"\
-    "COUNT(IF(A.type_action='rebond' AND A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur=J.id_joueur,1,NULL)) AS nb_rebond,"\
-    "COUNT(IF(A.type_action='revirement' AND A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur=J.id_joueur AND" \
-    "(SELECT type_revirement FROM revirement WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant)='offensif'"\
-    ",1,NULL)) AS nb_revirement ," \
-    "COUNT(IF(A.type_action='lancer'  AND A.annee=P.annee AND A.num_partie=P.num_partie AND" \
-    "(SELECT id_joueur FROM assiste WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant) = J.id_joueur" \
-    ",1,NULL)) AS asisstance ," \
-    "COUNT(IF(A.type_action='lancer' AND A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur=J.id_joueur AND" \
-    "(SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '1pt'" \
-    ",1,NULL)) AS lancerfranc, "\
-    "COUNT(IF(A.type_action='lancer' AND A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur=J.id_joueur AND" \
-    "(SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '2pt'"\
-    ",1,NULL)) AS panier2pt," \
-    "COUNT(IF(A.type_action='lancer' AND A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur=J.id_joueur AND" \
-    "(SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '3pt'" \
-    ",1,NULL)) AS panier3ptc," \
-    "COUNT(IF(A.type_action='revirement' AND A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur=J.id_joueur AND"\
-	 "(SELECT type_revirement FROM revirement WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant)='defensif'"\
-    ",1,NULL)) AS nb_volballe"\
-    " FROM  partie P,concoure Cc, contrat Ct, participe PA, joueur J, action A" \
-    " WHERE P.annee = %s AND P.num_partie =%s AND" \
-    " Cc.annee= P.annee AND Cc.num_partie = P.num_partie" \
-    " AND PA.annee = P.annee AND PA.num_partie = P.num_partie" \
-    " AND J.id_joueur = PA.id_joueur" \
-    " AND Ct.id_joueur = J.id_joueur AND Ct.num_equipe = Cc.num_equipe_loc" \
-    " AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl" \
-    " GROUP BY J.id_joueur;" 
+    cmd3="""SELECT J.id_joueur, Ct.dossard,J.nom_famille, J.prenom, J.role, PA.minutes,
+        COUNT(IF(A.type_action='faute'  AND A.id_joueur=J.id_joueur,1,NULL)) AS nb_faute,
+        COUNT(IF(A.type_action='rebond' AND A.id_joueur=J.id_joueur,1,NULL)) AS nb_rebond,
+        COUNT(IF(A.type_action='revirement'  AND A.id_joueur=J.id_joueur AND
+            (SELECT type_revirement FROM revirement WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant)='offensif'
+            ,1,NULL)) AS nb_revirement ,
+        COUNT(IF(A.type_action='lancer'  AND
+            (SELECT id_joueur FROM assiste WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant) = J.id_joueur
+            ,1,NULL)) AS asisstance ,
+        COUNT(IF(A.type_action='lancer' AND  A.id_joueur=J.id_joueur AND
+            (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '1pt'
+            ,1,NULL)) AS lancerfranc,
+        COUNT(IF(A.type_action='lancer'  AND A.id_joueur=J.id_joueur AND
+            (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '2pt'
+            ,1,NULL)) AS panier2pt,
+        COUNT(IF(A.type_action='lancer'  AND A.id_joueur=J.id_joueur AND
+            (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '3pt'
+            ,1,NULL)) AS panier3ptc
+        FROM  concoure Cc, contrat Ct, participe PA, joueur J ,partie P LEFT JOIN  action A ON (P.annee, P.num_partie) = (A.annee, A.num_partie)
+        WHERE P.annee = %s AND P.num_partie =%s AND
+                Cc.annee= P.annee AND Cc.num_partie = P.num_partie
+                AND PA.annee = P.annee AND PA.num_partie = P.num_partie
+                AND J.id_joueur = PA.id_joueur
+                AND Ct.id_joueur = J.id_joueur AND Ct.num_equipe = Cc.num_equipe_loc
+                AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl
+        GROUP BY J.id_joueur;"""
     cur.execute(cmd3,(annee,num))
     joueurs1 = cur.fetchall()
     #liste joueur equipe 2 
-    cmd4="SELECT J.id_joueur, Ct.dossard,J.nom_famille, J.prenom, J.role, PA.minutes,"\
-    "COUNT(IF(A.type_action='faute'  AND A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur=J.id_joueur,1,NULL)) AS nb_faute,"\
-    "COUNT(IF(A.type_action='rebond' AND A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur=J.id_joueur,1,NULL)) AS nb_rebond,"\
-    "COUNT(IF(A.type_action='revirement' AND A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur=J.id_joueur AND" \
-    "(SELECT type_revirement FROM revirement WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant)='offensif'"\
-    ",1,NULL)) AS nb_revirement ," \
-    "COUNT(IF(A.type_action='lancer'  AND A.annee=P.annee AND A.num_partie=P.num_partie AND" \
-    "(SELECT id_joueur FROM assiste WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant) = J.id_joueur" \
-    ",1,NULL)) AS asisstance ," \
-    "COUNT(IF(A.type_action='lancer' AND A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur=J.id_joueur AND" \
-    "(SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '1pt'" \
-    ",1,NULL)) AS lancerfranc, "\
-    "COUNT(IF(A.type_action='lancer' AND A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur=J.id_joueur AND" \
-    "(SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '2pt'"\
-    ",1,NULL)) AS panier2pt," \
-    "COUNT(IF(A.type_action='lancer' AND A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur=J.id_joueur AND" \
-    "(SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '3pt'" \
-    ",1,NULL)) AS panier3ptc," \
-    "COUNT(IF(A.type_action='revirement' AND A.annee=P.annee AND A.num_partie=P.num_partie AND A.id_joueur=J.id_joueur AND"\
-	 "(SELECT type_revirement FROM revirement WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant)='defensif'"\
-    ",1,NULL)) AS nb_volballe"\
-    " FROM  partie P,concoure Cc, contrat Ct, participe PA, joueur J, action A" \
-    " WHERE P.annee =%s AND P.num_partie =%s AND" \
-    " Cc.annee= P.annee AND Cc.num_partie = P.num_partie" \
-    " AND PA.annee = P.annee AND PA.num_partie = P.num_partie" \
-    " AND J.id_joueur = PA.id_joueur" \
-    " AND Ct.id_joueur = J.id_joueur AND Ct.num_equipe = Cc.num_equipe_vis" \
-    " AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl" \
-    " GROUP BY J.id_joueur;" 
+    cmd4="""SELECT J.id_joueur, Ct.dossard,J.nom_famille, J.prenom, J.role, PA.minutes,
+        COUNT(IF(A.type_action='faute'  AND A.id_joueur=J.id_joueur,1,NULL)) AS nb_faute,
+        COUNT(IF(A.type_action='rebond' AND A.id_joueur=J.id_joueur,1,NULL)) AS nb_rebond,
+        COUNT(IF(A.type_action='revirement'  AND A.id_joueur=J.id_joueur AND
+            (SELECT type_revirement FROM revirement WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant)='offensif'
+            ,1,NULL)) AS nb_revirement ,
+        COUNT(IF(A.type_action='lancer'  AND
+            (SELECT id_joueur FROM assiste WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant) = J.id_joueur
+            ,1,NULL)) AS asisstance ,
+        COUNT(IF(A.type_action='lancer' AND  A.id_joueur=J.id_joueur AND
+            (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '1pt'
+            ,1,NULL)) AS lancerfranc,
+        COUNT(IF(A.type_action='lancer'  AND A.id_joueur=J.id_joueur AND
+            (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '2pt'
+            ,1,NULL)) AS panier2pt,
+        COUNT(IF(A.type_action='lancer'  AND A.id_joueur=J.id_joueur AND
+            (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '3pt'
+            ,1,NULL)) AS panier3ptc
+        FROM  concoure Cc, contrat Ct, participe PA, joueur J ,partie P LEFT JOIN  action A ON (P.annee, P.num_partie) = (A.annee, A.num_partie)
+        WHERE P.annee = %s AND P.num_partie =%s AND
+                Cc.annee= P.annee AND Cc.num_partie = P.num_partie
+                AND PA.annee = P.annee AND PA.num_partie = P.num_partie
+                AND J.id_joueur = PA.id_joueur
+                AND Ct.id_joueur = J.id_joueur AND Ct.num_equipe = Cc.num_equipe_vis
+                AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl
+        GROUP BY J.id_joueur;"""
     cur.execute(cmd4,(annee,num))
     joueurs2 = cur.fetchall()
     #liste action

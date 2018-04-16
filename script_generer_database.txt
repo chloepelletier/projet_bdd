@@ -222,7 +222,7 @@ CREATE TABLE lancer (annee int UNSIGNED, num_partie int UNSIGNED, instant time, 
 	PRIMARY KEY(annee, num_partie, instant),
 	FOREIGN KEY(type_lancer) REFERENCES type_lancer(type),
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
-		ON NO ACTION);
+		ON DELETE NO ACTION);
 /* No action car 'CASCADE' ne déclenche pas le trigger de suppression de lancer. */
 
 delimiter //
@@ -315,11 +315,9 @@ FOR EACH ROW
 BEGIN
 /* trop de choses peuvent changer. Recalculer les points au complet */
 /*recalcule pour vieille partie */
-
 /*recalcule pour nouvelle partie */
 END;//
 delimiter ;
-
 
 
 CREATE TABLE assiste(id_joueur int UNSIGNED NOT NULL, annee int UNSIGNED, num_partie int UNSIGNED, instant time,
