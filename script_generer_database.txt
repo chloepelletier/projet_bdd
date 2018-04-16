@@ -5,23 +5,45 @@ use basketballer;
 show tables;
 
 
-CREATE TABLE equipe (num_equipe int, nom_equipe char(20), ville char(20), pays char(20), 
+CREATE TABLE equipe (num_equipe int UNSIGNED, nom_equipe char(20), ville char(20), pays char(20), 
 	fondation date, PRIMARY KEY(num_equipe));
 
-CREATE TABLE joueur (id_joueur int, prenom char(20),
-	nom_famille char(20), naissance date, taille_ft  real, poids_lbs real,
-	role char(20), est_droitier bool, dist_bras_ft real,
+CREATE TABLE joueur (id_joueur int UNSIGNED, prenom char(20),
+	nom_famille char(20), naissance date, taille_ft real UNSIGNED, poids_lbs real UNSIGNED,
+	role char(20), est_droitier bool, dist_bras_ft real UNSIGNED,
 	PRIMARY KEY(id_joueur));
 
-CREATE TABLE partie (annee int, num_partie int, ville char(20), date_partie date,
+CREATE TABLE partie (annee int UNSIGNED, num_partie int UNSIGNED, ville char(20), date_partie date,
 	PRIMARY KEY(annee, num_partie));
 /*DF date_partie -> annee.
-  Ajouter est_serie bool ? (Redondant)
+  Ajouter est_serie bool ? (Redondant. Mieux d eregarder dans 'appartient')
 */
 
-CREATE TABLE serie (annee int, num_serie int, PRIMARY KEY(annee, num_serie));
+/* Crée une genre DF: annee, date -> num_partie (nouvelle clé candidate) */
+/* Donc pas ajouté, aps testé
+delimiter //
+CREATE TRIGGER parties_saison_ordre_chrono
+BEFORE INSERT ON partie
+FOR EACH ROW
+BEGIN
+IF (EXISTS (SELECT NULL
+			FROM partie P
+			WHERE P.annee=NEW.annee AND P.num_partie < P.num_partie.NEW
+			AND P.date_partie > NEW.date_partie))
+OR
+(EXISTS (SELECT NULL
+			FROM partie P
+			WHERE P.annee=NEW.annee AND P.num_partie > P.num_partie.NEW
+			AND P.date_partie < NEW.date_partie))
+THEN SET NEW.annee = null;
+END IF;
+END;//
+delimiter ;
+pas ajouté, pas testé */
 
-CREATE TABLE appartient(annee int, num_partie int NOT NULL, num_serie int NOT NULL, num_sous_serie int NOT NULL,
+CREATE TABLE serie (annee int UNSIGNED, num_serie int UNSIGNED, PRIMARY KEY(annee, num_serie));
+
+CREATE TABLE appartient(annee int UNSIGNED, num_partie int UNSIGNED NOT NULL, num_serie int UNSIGNED NOT NULL, num_sous_serie int UNSIGNED NOT NULL,
 	PRIMARY KEY(annee, num_serie, num_sous_serie),
 	UNIQUE (annee, num_partie),
 	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
@@ -72,46 +94,22 @@ END;//
 delimiter ;
 /* Pourrait essayer de corriger en inversant les numéros de num_sous_serie */
 
-/*Besoin de trigger pour pas plus de 4 parties gagnées pour une équipe */
 
-CREATE TABLE concoure(annee int, num_partie int, num_equipe_loc int NOT NULL, num_equipe_vis int NOT NULL,
-	points_loc int, points_vis int, PRIMARY KEY(annee, num_partie),
+CREATE TABLE concoure(annee int UNSIGNED, num_partie int UNSIGNED, num_equipe_loc int UNSIGNED NOT NULL, num_equipe_vis int UNSIGNED NOT NULL,
+	points_loc int UNSIGNED DEFAULT 0, points_vis int UNSIGNED DEFAULT 0,
+	PRIMARY KEY(annee, num_partie),
 	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
 	FOREIGN KEY(num_equipe_loc) REFERENCES equipe(num_equipe) ON DELETE CASCADE,
 	FOREIGN KEY(num_equipe_vis) REFERENCES equipe(num_equipe) ON DELETE CASCADE);
-/*Points sont évidemments une redondance */
-	
-delimiter //
-CREATE TRIGGER points_null
-BEFORE INSERT ON concoure
-FOR EACH ROW
-BEGIN
-	IF (NEW.points_loc IS null)
-	THEN SET NEW.points_loc = 0;
-	END IF;
-	IF (NEW.points_vis IS null)
-	THEN SET NEW.points_vis = 0;
-	END IF;
-END;//
-delimiter ;
+/*Points sont évidemment une redondance */
 
-CREATE TABLE contrat(num_equipe int NOT NULL, id_joueur int NOT NULL,
-	debut_incl date NOT NULL, fin_excl date, dossard int NOT NULL,
+CREATE TABLE contrat(num_equipe int UNSIGNED NOT NULL, id_joueur int UNSIGNED NOT NULL,
+	debut_incl date NOT NULL, fin_excl date DEFAULT '9999-12-31' NOT NULL, dossard int UNSIGNED NOT NULL,
 	PRIMARY KEY(id_joueur, debut_incl),
 	UNIQUE (num_equipe, debut_incl, dossard),
 	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE,
 	FOREIGN KEY(num_equipe) REFERENCES equipe(num_equipe) ON DELETE CASCADE);
 
-delimiter //
-CREATE TRIGGER fin_contrat_null
-BEFORE INSERT ON contrat
-FOR EACH ROW
-BEGIN
-	IF (NEW.fin_excl IS null)
-	THEN SET NEW.fin_excl = '9999-12-31';
-	END IF;
-END;//
-delimiter ;
 
 delimiter //
 CREATE TRIGGER date_coherentes
@@ -160,7 +158,7 @@ END IF;
 END;//
 delimiter ;
 
-CREATE TABLE participe(id_joueur int, annee int, num_partie int NOT NULL, minutes int,
+CREATE TABLE participe(id_joueur int UNSIGNED, annee int UNSIGNED, num_partie int UNSIGNED NOT NULL, minutes int UNSIGNED DEFAULT 0,
 	PRIMARY KEY(annee, num_partie, id_joueur),
 	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
 	FOREIGN KEY(id_joueur) REFERENCES joueur(id_joueur) ON DELETE CASCADE);
@@ -206,8 +204,8 @@ delimiter ;
 CREATE TABLE type_action(type char(20), PRIMARY KEY(type));
 INSERT INTO type_action VALUES ("lancer"), ("revirement"), ("faute"), ("rebond");
 
-CREATE TABLE action (annee int, num_partie int, instant time, type_action char(20),
-	id_joueur int NOT NULL,
+CREATE TABLE action (annee int UNSIGNED, num_partie int UNSIGNED, instant time, type_action char(20),
+	id_joueur int UNSIGNED NOT NULL,
 	PRIMARY KEY(annee, num_partie, instant),
 	FOREIGN KEY(annee, num_partie) REFERENCES partie(annee, num_partie) ON DELETE CASCADE,
 	FOREIGN KEY(type_action) REFERENCES type_action(type) ON DELETE CASCADE,
@@ -220,7 +218,7 @@ CREATE TABLE action (annee int, num_partie int, instant time, type_action char(2
 CREATE TABLE type_lancer(type char(20), PRIMARY KEY(type));
 INSERT INTO type_lancer VALUES ("1pt"), ("2pt"), ("3pt");
 
-CREATE TABLE lancer (annee int, num_partie int, instant time, type_lancer char(20) NOT NULL, est_panier bool NOT NULL,
+CREATE TABLE lancer (annee int UNSIGNED, num_partie int UNSIGNED, instant time, type_lancer char(20) NOT NULL, est_panier bool NOT NULL,
 	PRIMARY KEY(annee, num_partie, instant),
 	FOREIGN KEY(type_lancer) REFERENCES type_lancer(type),
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
@@ -246,10 +244,6 @@ FOR EACH ROW
 BEGIN
 IF (NEW.est_panier)
 THEN
-	/*
-    SET @points = (SELECT COUNT(IF(NEW.type_lancer = "1pt",1,NULL)));
-    
-    */
     SET @points = (SELECT( 1*COUNT(IF(NEW.type_lancer = "1pt",1,NULL)) +
 			2*COUNT(IF(NEW.type_lancer = "2pt",1,NULL)) +
 			3*COUNT(IF(NEW.type_lancer = "3pt",1,NULL))));
@@ -278,13 +272,103 @@ END IF;
 END;//
 delimiter ;
 
-CREATE TABLE assiste(id_joueur int NOT NULL, annee int, num_partie int, instant time,
+delimiter //
+CREATE TRIGGER retirer_points_au_panier
+AFTER DELETE ON lancer
+FOR EACH ROW
+BEGIN
+IF (OLD.est_panier)
+THEN
+    SET @points = (SELECT( 1*COUNT(IF(OLD.type_lancer = "1pt",1,NULL)) +
+			2*COUNT(IF(OLD.type_lancer = "2pt",1,NULL)) +
+			3*COUNT(IF(OLD.type_lancer = "3pt",1,NULL))));
+
+	SET @equipe_local =
+	(SELECT COUNT(*)
+	FROM partie P, concoure Cc, contrat Ct, action A
+		 WHERE P.annee = NEW.annee AND P.num_partie = NEW.num_partie
+		  AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
+		  AND A.annee=NEW.annee AND A.num_partie=NEW.num_partie AND A.instant=NEW.instant
+		  AND Ct.num_equipe = Cc.num_equipe_loc AND Ct.id_joueur = A.id_joueur
+		  AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl );
+		  
+	IF(@equipe_local > 0)
+	THEN 
+		UPDATE concoure
+		SET points_loc = points_loc - @points
+		WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
+	ELSE
+		UPDATE concoure
+		SET points_vis = points_vis - @points
+		WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
+	END IF;
+END IF;
+END;//
+delimiter ;
+
+delimiter //
+CREATE TRIGGER modifier_points_au_panier
+EBFORE UPDATE ON lancer
+FOR EACH ROW
+BEGIN
+	SET @n_points = (SELECT( 1*COUNT(IF(NEW.type_lancer = "1pt",1,NULL)) +
+			2*COUNT(IF(NEW.type_lancer = "2pt",1,NULL)) +
+			3*COUNT(IF(NEW.type_lancer = "3pt",1,NULL))));
+	SET @o_points= (SELECT( 1*COUNT(IF(OLD.type_lancer = "1pt",1,NULL)) +
+			2*COUNT(IF(OLD.type_lancer = "2pt",1,NULL)) +
+			3*COUNT(IF(OLD.type_lancer = "3pt",1,NULL))));
+	SET @d_points = n_points - o_points;
+	SET @equipe_local =
+		(SELECT COUNT(*)
+		FROM partie P, concoure Cc, contrat Ct, action A
+			 WHERE P.annee = NEW.annee AND P.num_partie = NEW.num_partie
+			  AND Cc.annee = NEW.annee AND Cc.num_partie = NEW.num_partie
+			  AND A.annee=NEW.annee AND A.num_partie=NEW.num_partie AND A.instant=NEW.instant
+			  AND Ct.num_equipe = Cc.num_equipe_loc AND Ct.id_joueur = A.id_joueur
+			  AND Ct.debut_incl <= P.date_partie AND P.date_partie < Ct.fin_excl );
+	IF (OLD.est_panier AND NEW.est_panier) THEN
+		
+		IF(@equipe_local > 0) THEN 
+			UPDATE concoure
+			SET points_loc = points_loc + @d_points
+			WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
+		ELSE
+			UPDATE concoure
+			SET points_vis = points_vis + @d_points
+			WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
+		END IF;
+	ELSEIF(OLD.est_panier AND NOT NEW.est_panier) THEN
+		IF(@equipe_local > 0) THEN 
+			UPDATE concoure
+			SET points_loc = points_loc - @o_points
+			WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
+		ELSE
+			UPDATE concoure
+			SET points_vis = points_vis - @o_points
+			WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
+		END IF;
+	ELSEIF(NOT OLD.est_panier AND NEW.est_panier) THEN
+		IF(@equipe_local > 0) THEN 
+			UPDATE concoure
+			SET points_loc = points_loc + @n_points
+			WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
+		ELSE
+			UPDATE concoure
+			SET points_vis = points_vis + @n_points
+			WHERE annee=NEW.annee AND num_partie=NEW.num_partie;
+		END IF;
+	END IF;
+END;//
+delimiter ;
+
+
+
+CREATE TABLE assiste(id_joueur int UNSIGNED NOT NULL, annee int UNSIGNED, num_partie int UNSIGNED, instant time,
 	PRIMARY KEY(annee, num_partie, instant),
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES lancer(annee, num_partie, instant)
 		ON DELETE CASCADE,
 	FOREIGN KEY(annee, num_partie,id_joueur) REFERENCES participe(annee, num_partie,id_joueur)
 		ON DELETE CASCADE);
-/* Mettre NOT NULL à id_joueur? */
 
 delimiter //
 CREATE TRIGGER assiste_panier
@@ -324,7 +408,7 @@ delimiter ;
 CREATE TABLE type_faute(type char(20), PRIMARY KEY(type));
 INSERT INTO type_faute VALUES ("offensif"), ("defensif");
 
-CREATE TABLE revirement (annee int, num_partie int, instant time, type_revirement char(20) NOT NULL,
+CREATE TABLE revirement (annee int UNSIGNED, num_partie int UNSIGNED, instant time, type_revirement char(20) NOT NULL,
 	PRIMARY KEY(annee, num_partie, instant),
 	FOREIGN KEY(type_revirement) REFERENCES type_faute(type),
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
@@ -343,7 +427,7 @@ BEGIN
 END;//
 delimiter ;
 
-CREATE TABLE faute (annee int, num_partie int, instant time, type_faute char(20) NOT NULL,
+CREATE TABLE faute (annee int UNSIGNED, num_partie int UNSIGNED, instant time, type_faute char(20) NOT NULL,
 	PRIMARY KEY(annee, num_partie, instant),
 	FOREIGN KEY(type_faute) REFERENCES type_faute(type),
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant)
@@ -363,7 +447,7 @@ END;//
 delimiter ;
 
 
-CREATE TABLE rebond (annee int, num_partie int, instant time, type_rebond char(20) NOT NULL,
+CREATE TABLE rebond (annee int UNSIGNED, num_partie int UNSIGNED, instant time, type_rebond char(20) NOT NULL,
 	PRIMARY KEY(annee, num_partie, instant),
 	FOREIGN KEY(type_rebond) REFERENCES type_faute(type),
 	FOREIGN KEY(annee, num_partie, instant) REFERENCES action(annee, num_partie, instant) 
