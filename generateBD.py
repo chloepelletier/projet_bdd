@@ -7,6 +7,7 @@ from random import randint
 
 conn= pymysql.connect(host='localhost',
                         user='root',
+                        password='1994')
 cur=conn.cursor()
 
 """Création de la base de données"""
@@ -24,9 +25,15 @@ cmd6 = """CREATE TABLE joueur (id_joueur int UNSIGNED, prenom char(20),
 	role char(20), est_droitier bool, dist_bras_ft real UNSIGNED,
 	PRIMARY KEY(id_joueur));"""
 cur.execute(cmd6)
+cmd602 = """CREATE INDEX index_nom_joueur USING BTREE
+    ON joueur (nom_famille, prenom);"""
+cur.execute(cmd602)
 cmd7 = """CREATE TABLE partie (annee int UNSIGNED, num_partie int UNSIGNED, ville char(20), date_partie date,
 	PRIMARY KEY(annee, num_partie));"""
 cur.execute(cmd7)
+cmd702 = """CREATE INDEX index_date_partie USING BTREE
+    ON partie (date_partie);"""
+cur.execute(cmd702)
 cmd8 = "CREATE TABLE serie (annee int UNSIGNED, num_serie int UNSIGNED, PRIMARY KEY(annee, num_serie));"
 cur.execute(cmd8)
 cmd9 = """CREATE TABLE appartient(annee int UNSIGNED, num_partie int UNSIGNED NOT NULL, num_serie int UNSIGNED NOT NULL, num_sous_serie int UNSIGNED NOT NULL,

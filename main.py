@@ -412,7 +412,10 @@ def getPartie(annee=None,num=None):
             ,1,NULL)) AS panier2pt,
         COUNT(IF(A.type_action='lancer'  AND A.id_joueur=J.id_joueur AND
             (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '3pt'
-            ,1,NULL)) AS panier3ptc
+            ,1,NULL)) AS panier3ptc,
+        COUNT(IF(A.type_action='revirement' AND A.id_joueur=J.id_joueur AND
+            (SELECT type_revirement FROM revirement WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant)='defensif'
+            ,1,NULL)) AS nb_volballe
         FROM  concoure Cc, contrat Ct, participe PA, joueur J ,partie P LEFT JOIN  action A ON (P.annee, P.num_partie) = (A.annee, A.num_partie)
         WHERE P.annee = %s AND P.num_partie =%s AND
                 Cc.annee= P.annee AND Cc.num_partie = P.num_partie
@@ -441,7 +444,10 @@ def getPartie(annee=None,num=None):
             ,1,NULL)) AS panier2pt,
         COUNT(IF(A.type_action='lancer'  AND A.id_joueur=J.id_joueur AND
             (SELECT type_lancer FROM lancer WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant AND est_panier=1) = '3pt'
-            ,1,NULL)) AS panier3ptc
+            ,1,NULL)) AS panier3ptc,
+        COUNT(IF(A.type_action='revirement' AND A.id_joueur=J.id_joueur AND
+            (SELECT type_revirement FROM revirement WHERE annee=A.annee AND num_partie = A.num_partie AND instant = A.instant)='defensif'
+            ,1,NULL)) AS nb_volballe
         FROM  concoure Cc, contrat Ct, participe PA, joueur J ,partie P LEFT JOIN  action A ON (P.annee, P.num_partie) = (A.annee, A.num_partie)
         WHERE P.annee = %s AND P.num_partie =%s AND
                 Cc.annee= P.annee AND Cc.num_partie = P.num_partie
